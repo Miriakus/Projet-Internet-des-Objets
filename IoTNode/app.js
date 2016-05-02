@@ -5,14 +5,27 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-var routes = require('./app/routes/index');
-var users = require('./app/routes/users');
 
 var app = express();
 
+var mongoose = require('mongoose');
+var server = require('http').createServer(app);
+
+var io = require('socket.io').listen(server);
+
+var routes = require('./app/routes/index');
+var users = require('./app/routes/users');
+
+
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(__dirname, 'app/views'));
 app.set('view engine', 'jade');
+
+mongoose.connect('mongodb://localhost/bdd', function (err) {
+    if (err) {
+        throw err;
+    }
+});
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -56,5 +69,14 @@ app.use(function(err, req, res, next) {
   });
 });
 
+io.sockets.on('connection',function(socket){
+    console.log("un client est connecté");
+});
 
+
+
+
+
+
+server.listen(8080);
 module.exports = app;
