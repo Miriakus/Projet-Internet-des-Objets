@@ -2,16 +2,24 @@
  * Created by Guillaume on 02/05/2016.
  */
 
+var socket = io('http://localhost:3000');
+socket.on('message', function (data) {
+    console.log(data);
+    socket.emit('my other event', { my: 'data' });
+});
+
 var cpuDatas = [0, 4, 0, 0, 3, 10, 45, 20, 3, 2, 2, 1, 4, 6, 2];
 var ramDatas = [48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 60];
 var diskDatas = [0, 0, 0, 0, 0, 0, 4, 50, 20, 10, 3, 0, 0, 0, 0];
 var linkDatas = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
 var chart;
 var options = {
     title: 'Company Performance',
     curveType: 'function',
     legend: { position: 'bottom' }
 };
+
 var baseArray = [];
 var cpt = 0;
 
@@ -54,7 +62,7 @@ function graphTab() {
     var graphTab = [];
     graphTab.push(['i', 'CPU', 'RAM', 'Disk', 'Link']);
     for (var i = 0; i < cpuDatas.length; i++) {
-        graphTab.push([cpt, cpuDatas[i], ramDatas[i], diskDatas[i], linkDatas[i]])
+        graphTab.push([cpt, cpuDatas[i], ramDatas[i], diskDatas[i], linkDatas[i]]);
         cpt++;
     }
     return graphTab;
@@ -66,7 +74,6 @@ function reload(){
     updateDataGraph(50, 48, 30, 0);
     var array = graphTab();
 
-    console.log(array);
     var data = google.visualization.arrayToDataTable(array);
 
     chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
@@ -83,3 +90,4 @@ var interval = setInterval(function(){
     }
 
 },1000);
+

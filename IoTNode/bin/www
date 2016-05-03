@@ -7,6 +7,8 @@
 var app = require('../app');
 var debug = require('debug')('IoTNode:server');
 var http = require('http');
+var net = require('net');
+
 
 /**
  * Get port from environment and store in Express.
@@ -21,6 +23,7 @@ app.set('port', port);
 
 var server = http.createServer(app);
 
+var io = require('socket.io').listen(server);
 /**
  * Listen on provided port, on all network interfaces.
  */
@@ -88,3 +91,31 @@ function onListening() {
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
 }
+/*var p = new Promise(function (resolve, reject) {
+    net.createServer(function (socket) {
+        socket.on('data', function (data) {
+            var buffer = new Buffer(data);
+            console.log(buffer.toString());
+        })
+    }).listen(5000);
+    resolve()
+});
+
+p.then(function(){
+    io.sockets.on('connection', function (socket) {
+        console.log("un client est connecté");
+    });
+});*/
+
+io.sockets.on('connection', function (socket) {
+    console.log("un client est connecté");
+});
+
+net.createServer(function (socket) {
+    socket.on('data', function (data) {
+        var buffer = new Buffer(data);
+        io.sockets.emit('message','NEW MESSAGE : ' + buffer.toString());
+    })
+}).listen(5000);
+
+
