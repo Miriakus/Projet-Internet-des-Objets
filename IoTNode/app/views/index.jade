@@ -2,44 +2,6 @@ extends layout
 
 block content
     p Task Manager
-
-        script(type='text/javascript').
-            var socket = io.connect('http://localhost:8080');
-
-            updateDatasGraph(50,48,30,0);
-
-            google.charts.load('current', {'packages': ['line']});
-            google.charts.setOnLoadCallback(drawChart);
-
-            function drawChart() {
-
-                var data = new google.visualization.DataTable();
-                data.addColumn('number', 'time');
-                data.addColumn('number', 'cpu');
-                data.addColumn('number', 'ram');
-                data.addColumn('number', 'disk');
-                data.addColumn('number', 'link');
-
-                data.addRows(graphTab());
-
-                var options = {
-                    chart: {
-                        title: 'Task Manager'
-                    },
-                    width: 900,
-                    height: 500,
-                    axes: {
-                        x: {
-                            0: {side: 'top'}
-                        }
-                    }
-                };
-
-                var chart = new google.charts.Line(document.getElementById('line_top_x'));
-
-                chart.draw(data, options);
-            }
-
-        div(id = "line_top_x")
+        div(id = 'curve_chart' style="width: 900px; height: 500px")
 
 
