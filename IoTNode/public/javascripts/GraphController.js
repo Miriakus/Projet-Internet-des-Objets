@@ -74,7 +74,7 @@ function graphTab() {
 
 
 function reload(){
-    updateDataGraph(receiveDatas.datas[0], receiveDatas.datas[1], receiveDatas.datas[2], receiveDatas.datas[3]);
+    updateDataGraph(receiveDatas.data[0], receiveDatas.data[1], receiveDatas.data[2], receiveDatas.data[3]);
 
     var array = graphTab();
     var data = google.visualization.arrayToDataTable(array);

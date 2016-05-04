@@ -120,7 +120,7 @@ net.createServer(function (socket) {
 
 var i = 0;
 var interval = setInterval(function () {
-    io.sockets.emit('message', {datas: [3, 48, 5, 22]});
+    io.sockets.emit('message', {data: [3 *Math.random() , 48 * Math.random(), 5 * Math.random(), 22 * Math.random()]});
     i++;
 }, 1000);
 
