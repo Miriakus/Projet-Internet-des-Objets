@@ -111,12 +111,21 @@ io.sockets.on('connection', function (socket) {
     console.log("un client est connecté");
 });
 
-net.createServer(function (socket) {
+/*net.createServer(function (socket) {
+
     socket.on('data', function (data) {
         var buffer = new Buffer(data);
         io.sockets.emit('message', 'NEW MESSAGE : ' + buffer.toString());
     })
-}).listen(5000);
+}).listen(5000);*/
+
+var serveNode = new net.Socket();
+
+serveNode.connect(60764, '10.75.18.150', function(error) {
+    console.log('Connected');
+    serveNode.write('OK');
+
+});
 
 var i = 0;
 var interval = setInterval(function () {
