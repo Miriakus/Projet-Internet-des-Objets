@@ -2,17 +2,14 @@
  * Created by Guillaume on 02/05/2016.
  */
 
-var socket = io('http://localhost:3000');
-socket.on('message', function (data) {
-    console.log(data);
-    socket.emit('my other event', { my: 'data' });
-});
+
 
 var cpuDatas = [0, 4, 0, 0, 3, 10, 45, 20, 3, 2, 2, 1, 4, 6, 2];
 var ramDatas = [48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 60];
 var diskDatas = [0, 0, 0, 0, 0, 0, 4, 50, 20, 10, 3, 0, 0, 0, 0];
 var linkDatas = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
+var receiveDatas = [];
 var chart;
 var options = {
     title: 'Company Performance',
@@ -26,8 +23,15 @@ var cpt = 0;
 google.charts.load('current', {'packages':['corechart']});
 google.charts.setOnLoadCallback(drawChart);
 
+var socket = io('http://localhost:3000');
+socket.on('message', function (datas) {
+    receiveDatas = datas;
+    reload()
+});
+
+
+
 function drawChart() {
-    updateDataGraph(50, 48, 30, 0);
     var array = graphTab();
     var data = google.visualization.arrayToDataTable(array);
 
@@ -70,10 +74,9 @@ function graphTab() {
 
 
 function reload(){
+    updateDataGraph(receiveDatas.datas[0], receiveDatas.datas[1], receiveDatas.datas[2], receiveDatas.datas[3]);
 
-    updateDataGraph(50, 48, 30, 0);
     var array = graphTab();
-
     var data = google.visualization.arrayToDataTable(array);
 
     chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
@@ -82,12 +85,12 @@ function reload(){
 }
 
 var i = 0;
-var interval = setInterval(function(){
+/*var interval = setInterval(function(){
     reload();
     i++;
     if (i == 15){
         clearInterval(interval)
     }
 
-},1000);
+},1000);*/
 
