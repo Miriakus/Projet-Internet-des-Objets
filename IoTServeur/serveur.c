@@ -9,6 +9,8 @@
 #include <sys/socket.h>
 #include <netdb.h>
 
+#include "capteur.h"
+
 struct sockaddr_in Sin = {AF_INET}; /* le reste est nul */
 
 int readlig(int fd, char *b, int max)
@@ -24,11 +26,15 @@ char c;
     return(n);
 }
 
-#define LBUF 100
+#define LBUF 255
 void service(int sid)
 {
+Cpu cpu;
+Ram ram;
+Swap swap;
+Network net;
 int n, i;
-char buf[LBUF];
+char buf[LBUF], data[LBUF];
     n = readlig(sid,buf,LBUF);
     if (n < 0) {
        perror("readlig");
@@ -37,7 +43,16 @@ char buf[LBUF];
     i = 0;
     fprintf(stderr, "Recu : %s\n", buf);
 
-    write(sid,"erreur !! ", 11);
+    cpu = cpuCheck();
+    ram = ramCheck();
+    swap = swapCheck();
+    net = networkCheck();
+
+    sprintf(data, "{ram: %g, swap: %g, download: %ld, upload: %ld}", ram.pcentUsed, swap.pcentUsed, net.totalDown, net.totalUp);
+
+    fprintf(stderr, "Emit : %s\n", data);
+
+    write(sid,data, 11);
     close(sid);
 }
 
@@ -49,6 +64,7 @@ int ln, sock, nsock;
         perror("socket");
         exit(1);
     }
+    Sin.sin_port = htons(42000);
     /* ATTACHEMENT AU PORT */
     if(bind(sock,(struct sockaddr*)&Sin, sizeof(Sin)) < 0) {
         perror("bind");
