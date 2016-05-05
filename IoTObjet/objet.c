@@ -71,7 +71,7 @@ static void * threadAuto (void *data)
 		net = networkCheck();
 
 		sprintf(nom, "USER: %ld - RAM: %g - SWAP: %g", cpu.user, ram.pcentUsed, swap.pcentUsed);
-		//fprintf(stderr, "info : %s\n", nom);
+		fprintf(stderr, "info : %s\n", nom);
 		write(sock,nom,strlen(nom));
 		/*printf("----------------------------------------------------------\n");
 		printf("Le nombre de tick processeur est %ld user, %ld idle\n", cpu.user, cpu.idle);
