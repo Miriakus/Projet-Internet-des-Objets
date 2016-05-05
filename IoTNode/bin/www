@@ -93,31 +93,34 @@ function onListening() {
 }
 
 
-
 io.sockets.on('connection', function (socket) {
     console.log("un client est connecté");
 });
 
+function connectionToServe(){
 
-var count = 0;
-setInterval(() => {
-    count++;
     const client = net.connect(42000, '90.44.156.12', () => {
-        client.write('world! ' + count + '\n');
+        client.write('DONNE MOI DES DONNEES!!! RAAAAAAAAAAAAAAAHHH!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n');
     });
     client.on('data', (data) => {
-        //var buffer = new Buffer(data);
-        //io.sockets.emit('message', 'NEW MESSAGE : ' + data.toString());
-        io.sockets.emit('message', {data: [3 * Math.random(), 48 * Math.random(), 5 * Math.random(), 22 * Math.random()]});
+        var values = JSON.parse(data.toString());
+        io.sockets.emit('message', {data: {cpu:3 * Math.random(), ram:values.ram, swap:values.swap,
+            disk:  5 * Math.random(), download: 22 * Math.random() , upload: 2 * Math.random()}});
         client.end();
     });
 
     client.on('error', function (err) {
         console.log("Connection failed");
+        connectionToServe();
     });
 
     /*client.on('end', () => {
-     console.log('disconnected from server');
-     });*/
-}, 1000);
+        connectionToServe()
+    });*/
+}
+setInterval(function(){
+    connectionToServe();
+},1000);
+
+
 

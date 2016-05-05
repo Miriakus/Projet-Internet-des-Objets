@@ -33,8 +33,10 @@ function drawChart() {
         ['Label', 'Value'],
         ['CPU', 0],
         ['Memory', 0],
+        ['Swap', 0],
         ['Disk', 0],
-        ['Network', 0]
+        ['Download', 0],
+        ['Upload', 0]
     ]);
 
     chart = new google.visualization.Gauge(document.getElementById('chart_div'));
@@ -45,10 +47,12 @@ function drawChart() {
 function reload(){
     data = google.visualization.arrayToDataTable([
         ['Label', 'Value'],
-        ['CPU', receiveData.data[0]],
-        ['Memory', receiveData.data[1]],
-        ['Disk',receiveData.data[2]],
-        ['Network', receiveData.data[3]]
+        ['CPU', receiveData.data.cpu],
+        ['RAM', receiveData.data.ram],
+        ['Swap', receiveData.data.swap],
+        ['Disk',receiveData.data.disk],
+        ['Network', receiveData.data.download],
+        ['Upload', receiveData.data.upload]
     ]);
     /*data.setValue(0,1, receiveData.data[0]);
     data.setValue(1,1, receiveData.data[1]);
