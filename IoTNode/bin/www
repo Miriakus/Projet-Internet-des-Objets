@@ -99,13 +99,13 @@ io.sockets.on('connection', function (socket) {
 
 function connectionToServe(){
 
-    const client = net.connect(42000, '90.44.156.12', () => {
+    const client = net.connect(42000, '82.123.161.192', () => {
         client.write('DONNE MOI DES DONNEES!!! RAAAAAAAAAAAAAAAHHH!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n');
     });
     client.on('data', (data) => {
         var values = JSON.parse(data.toString());
-        io.sockets.emit('message', {data: {cpu:3 * Math.random(), ram:values.ram, swap:values.swap,
-            disk:  5 * Math.random(), download: 22 * Math.random() , upload: 2 * Math.random()}});
+        io.sockets.emit('message', {data: {cpu: values.cpu, ram:values.ram, swap:values.swap,
+            disk:  5 * Math.random(), network: values.network}});
         client.end();
     });
 
