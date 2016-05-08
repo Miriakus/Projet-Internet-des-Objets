@@ -1,3 +1,7 @@
+/*
+ * capteur.c : capteurs de l'objet connecté
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
