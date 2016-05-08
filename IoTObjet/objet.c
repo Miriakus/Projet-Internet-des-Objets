@@ -1,128 +1,168 @@
+/*
+ * objet.c : main de l'objet connecté
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <string.h>
-#include <time.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <netinet/in.h>
 #include <netdb.h>
+#include <unistd.h>
 #include <pthread.h>
 
 #include "capteur.h"
 
-#define LBUF 255
-
+#define LBUF 1024
 
 typedef struct Store Store;
 struct Store {
-    pthread_t threadAuto;
-    pthread_t threadRequest;
+    pthread_t threadCapteur;
+    pthread_t threadServeur;
 
+    pthread_mutex_t mutexCapteur;
     char* address;
     char* port;
-    unsigned int frequence;
+    unsigned int frequence;         // millisecondes
+
+    Capteur capteur;
+    Capteur capteurOld;
 };
 
 static Store store =
 {
-    .frequence = 1000       // millisecondes
+    .frequence = 1000,
+    .mutexCapteur = PTHREAD_MUTEX_INITIALIZER
 };
 
 void error(const char *msg)
 {
     perror(msg);
-    exit(0);
+    exit(1);
 }
 
-static void * threadAuto (void *data)
+static void * threadCapteur (void *data)
 {
-    Cpu cpu;
-    Ram ram;
-    Swap swap;
-	Network net;
+    int isFirst = 1;
+    Capteur *capteur = &store.capteur;
+    Capteur *capteurOld = &store.capteurOld;
+    clock_t timer;
 
-	int sock;
-	struct sockaddr_in sin;
-	struct hostent *h;
-	char nom[LBUF], addr[LBUF];
     while (1) {
-        // initialisation socket
-        if ((sock=socket(AF_INET,SOCK_STREAM,IPPROTO_TCP)) < 0) {
-            perror("socket");
-            exit(2);
-        }
-        if(!(h=gethostbyname(store.address))) {
-            perror("gethostbyname");
-            exit(3);
-        }
-        // initialisation de sin
-        bzero(&sin,sizeof(sin));
-        sin.sin_family = AF_INET;
-        bcopy(h->h_addr,&sin.sin_addr,h->h_length);
-        sin.sin_port = htons(atoi(store.port));
-        if (connect(sock,(struct sockaddr*)&sin,sizeof(sin)) < 0) {
-            perror("connect");
-            exit(4);
-        }
-		cpu = cpuCheck();
-		ram = ramCheck();
-		swap = swapCheck();
-		net = networkCheck();
+        timer = clock();
+        /* Debut de la zone protegee. */
+        pthread_mutex_lock (& store.mutexCapteur);
 
-		sprintf(nom, "USER: %ld - RAM: %g - SWAP: %g", cpu.user, ram.pcentUsed, swap.pcentUsed);
-		//fprintf(stderr, "info : %s\n", nom);
-		write(sock,nom,strlen(nom));
-		/*printf("----------------------------------------------------------\n");
-		printf("Le nombre de tick processeur est %ld user, %ld idle\n", cpu.user, cpu.idle);
-		printf("L'utilisation de la RAM est de %g % (%ld/%ld Mo)\n", ram.pcentUsed, ram.used / 1024, ram.total / 1024);
-		printf("L'utilisation du Swap est de %g % (%ld/%ld Mo)\n", swap.pcentUsed, swap.used / 1024, swap.total / 1024);
-		printf("Le trafic reseau total est de %g Mo en DL et de %g Mo en UL\n", (double) net.totalDown/1024/1024, (double) net.totalUp/1024/1024);
-		printf("time %d\n", time(NULL));*/
-		//read(sock,addr,LBUF);
-		//fprintf(stderr, "Retour : %s\n",addr);
-		close(sock);
-		usleep(store.frequence * 1000);
+        if (isFirst) {
+            isFirst = 0;
+            capteurCheck(capteur);
+
+            capteur->cpu.pcentUsed = 0.;
+            capteur->disk.debitRead = 0;
+            capteur->disk.debitWrite = 0;
+            capteur->disk.pcentActive = 0.;
+            capteur->network.debitDown = 0;
+            capteur->network.debitUp = 0;
+        } else {
+            memcpy(capteurOld, capteur, sizeof *capteurOld);
+            capteurCheck(capteur);
+
+            calcCpuPcent(&capteur->cpu, &capteurOld->cpu);
+            calcDiskDebit(&capteur->disk, &capteurOld->disk, store.frequence);
+            calcNetworkDebit(&capteur->network, &capteurOld->network, store.frequence);
+        }
+		pthread_mutex_unlock (& store.mutexCapteur);
+		/* Fin de la zone protegee. */
+		usleep(store.frequence * 1000 - (clock()-timer));
    }
    return NULL;
 }
 
-
-int main(int N, char *P[]) {
-    Cpu cpu;
-    Ram ram;
-    Swap swap;
-	Network net;
-
-	int sock;
-	struct sockaddr_in sin;
-	struct hostent *h;
-	char nom[LBUF], addr[LBUF];
-
-    if (N != 3 ) {
-        fprintf(stderr,"Utilisation : %s nom_serveur port\n",P[0]);
-        exit(1);
+int readlig(int fd, char *b, int max)
+{
+int n;
+char c;
+    for (n=0; n<max; n++) {
+        if(read(fd, &c, 1) <= 0) break;
+        if (c == '\n') break;
+        *b++ = c;
     }
-
-    store.address = P[1];
-    store.port = P[2];
-
-    /* Creation des threads. */
-   printf ("Creation du thread d'envoi régulier !\n");
-   if (pthread_create (& store.threadAuto, NULL, threadAuto, NULL) != 0) {
-        perror("pthread");
-        exit(10);
-   }
-   pthread_join (store.threadAuto, NULL);
-
-    /*printf("Donner un nom de machine\n");
-    fgets(nom,LBUF,stdin);
-    write(sock,nom,strlen(nom));
-    read(sock,addr,LBUF);
-    nom[strlen(nom)-1]='\0';
-    if (strncmp(addr,"erreur !! ",9) == 0)
-       printf("La machine %s n'existe pas !\n", nom);
-    else
-       printf("La machine %s a pour adresse IP %s\n",nom,addr);*/
-    close(sock);
+    *b = '\0';
+    return(n);
 }
+
+void service(int sid)
+{
+    char buf[LBUF], data[LBUF];
+    if (readlig(sid,buf,LBUF) < 0) {
+       perror("readRequest");
+       return;
+    }
+    fprintf(stderr, "Recu : %s\n", buf);
+
+    /* Debut de la zone protegee. */
+    pthread_mutex_lock (& store.mutexCapteur);
+
+    Cpu *cpu = &store.capteur.cpu;
+    Ram *ram = &store.capteur.ram;
+    Swap *swap = &store.capteur.swap;
+    Disk *disk = &store.capteur.disk;
+    Network *network = &store.capteur.network;
+
+    sprintf(data, "{ \"cpu\": { \"user\": %ld, \"nice\": %ld, \"system\": %ld, \"idle\": %ld, \"pcentUsed\": %g }, \"ram\": { \"total\": %ld, \"free\": %ld, \"buffers\": %ld, \"cached\": %ld, \"used\": %ld, \"pcentUsed\": %g }, \"swap\": { \"total\": %ld, \"free\": %ld, \"cached\": %ld, \"used\": %ld, \"pcentUsed\": %g }, \"disk\": { \"totalRead\": %ld, \"totalWrite\": %ld, \"totalTimeActive\": %ld, \"debitRead\": %ld, \"debitWrite\": %ld, \"pcentActive\": %g }, \"network\": { \"totalDown\": %ld, \"totalUp\": %ld, \"debitDown\": %ld, \"debitUp\": %ld },\"time\": %ld }",
+        cpu->user, cpu->nice, cpu->system, cpu->idle, cpu->pcentUsed,
+        ram->total, ram->free, ram->buffers, ram->cached, ram->used, ram->pcentUsed,
+        swap->total, swap->free, swap->cached, swap->used, swap->pcentUsed,
+        disk->totalRead, disk->totalWrite, disk->totalTimeActive, disk->debitRead, disk->debitWrite, disk->pcentActive,
+        network->totalDown, network->totalUp, network->debitDown, network->debitUp,
+        store.capteur.time);
+
+    pthread_mutex_unlock (& store.mutexCapteur);
+    /* Fin de la zone protegee. */
+    fprintf(stderr, "Emit : %s\n", data);
+
+    if (write(sid,data, strlen(data)) < 0) {
+        perror("writeResponce");
+        return;
+    }
+    close(sid);
+}
+
+int main(int N, char *P[])
+{
+    // Creation des threads
+    if (pthread_create (& store.threadCapteur, NULL, threadCapteur, NULL) != 0)
+        error("pthread");
+    else
+        printf("Creation du thread d'acquisition des capteurs !\n");
+
+    struct sockaddr_in Sin = {AF_INET}; /* le reste est nul */
+    int ln, sock, nsock;
+    /* creation du socket */
+    if ((sock=socket(AF_INET,SOCK_STREAM,IPPROTO_TCP)) < 0)
+        error("socket");
+    /* ATTACHEMENT AU PORT */
+    Sin.sin_port = htons(42000);
+    if (bind(sock,(struct sockaddr*)&Sin, sizeof(Sin)) < 0)
+        error("bind");
+    ln = sizeof(Sin);
+    if (getsockname(sock,(struct sockaddr*)&Sin,(socklen_t*)&ln) < 0)
+        error("getsockname");
+    printf("Le serveur est attache au port %u\n",ntohs(Sin.sin_port));
+    /* definition du nb d'appels simultanes */
+    if (listen(sock,5) < 0)
+        error("listen");
+    /* boucle d'attente */
+    for (;;) {
+        if ((nsock=accept(sock,(struct sockaddr*)&Sin,(socklen_t*)&ln))<0)
+            error("accept");
+        service(nsock);
+    }
+    pthread_join (store.threadCapteur, NULL);
+
+    return 0;
+}
+
+
+
+

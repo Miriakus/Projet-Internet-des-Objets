@@ -7,3 +7,23 @@
 	<sys/socket.h>
 	<netdb.h>
 
+1462738598 source:/home/leo/Documents/Projet-Internet-des-Objets/IoTServeur/capteur.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<time.h>
+	"capteur.h"
+
+1462738457 /home/leo/Documents/Projet-Internet-des-Objets/IoTServeur/capteur.h
+
+1462738516 source:/home/leo/Documents/Projet-Internet-des-Objets/IoTServeur/serveur.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<sys/types.h>
+	<sys/socket.h>
+	<netdb.h>
+	<unistd.h>
+	<pthread.h>
+	"capteur.h"
+
