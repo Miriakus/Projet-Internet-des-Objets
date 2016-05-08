@@ -9,23 +9,25 @@
 #define FicMem "/proc/meminfo"
 #define FicNet "/proc/net/dev"
 
-Cpu cpuCheck(void) {
+Cpu cpuCheck()
+{
     FILE *fp;
 	Cpu proc;
 
-    if ((fp = fopen(FicCPU, "r")) == NULL) return;
+    if ((fp = fopen(FicCPU, "r")) == NULL) return proc;
     fscanf(fp, "cpu\t%ld %ld %ld %ld", &proc.user, &proc.nice, &proc.system, &proc.idle);
     fclose(fp);
 
     return proc;
 }
 
-Ram ramCheck(void) {
+Ram ramCheck()
+{
     FILE *fp;
     char buf[LBUF];
     Ram memory;
 
-    if ((fp = fopen(FicMem, "r")) == NULL) return;
+    if ((fp = fopen(FicMem, "r")) == NULL) return memory;
     while (fscanf(fp, "%s", buf) != 0) {
         if (strcmp(buf, "MemTotal:") == 0)
             fscanf(fp, "%ld", &memory.total);
@@ -47,12 +49,13 @@ Ram ramCheck(void) {
     return memory;
 }
 
-Swap swapCheck(void) {
+Swap swapCheck()
+{
     FILE *fp;
     char buf[LBUF];
     Swap memory;
 
-    if ((fp = fopen(FicMem, "r")) == NULL) return;
+    if ((fp = fopen(FicMem, "r")) == NULL) return memory;
     while (fscanf(fp, "%s", buf) != 0) {
         if (strcmp(buf, "SwapCached:") == 0)
             fscanf(fp, "%ld", &memory.cached);
@@ -72,13 +75,14 @@ Swap swapCheck(void) {
     return memory;
 }
 
-Network networkCheck(void) {
+Network networkCheck()
+{
     FILE *fp;
     char buf[LBUF];
     Network eth;
 	int i;
 
-    if ((fp = fopen(FicNet, "r")) == NULL) return;
+    if ((fp = fopen(FicNet, "r")) == NULL) return eth;
 	fgets(buf, LBUF-1, fp);
 	fgets(buf, LBUF-1, fp);
     fscanf(fp, "%s %ld", buf, &eth.totalDown);
@@ -92,4 +96,25 @@ Network networkCheck(void) {
     return eth;
 }
 
+void capteurCheck(Capteur *capteur)
+{
+    capteur->cpu = cpuCheck();
+    capteur->ram = ramCheck();
+    capteur->swap = swapCheck();
+    capteur->net = networkCheck();
+    capteur->time = time(NULL);
+}
+
+void calcCpuPcent(Cpu *cpu, Cpu *cpuOld)
+{
+    long diffUser, diffNice, diffSystem, diffIdle;
+
+    diffUser = cpu->user - cpuOld->user;
+    diffNice = cpu->nice - cpuOld->nice;
+    diffSystem = cpu->system - cpuOld->system;
+    diffIdle = cpu->idle - cpuOld->idle;
+
+    cpu->pcentUsed = (double) ((diffUser + diffNice + diffSystem) * 100L)
+        / (double) (diffUser + diffNice + diffSystem + diffIdle);
+}
 

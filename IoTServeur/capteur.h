@@ -7,6 +7,7 @@ struct Cpu {
     long nice;
     long system;
     long idle;
+    double pcentUsed;
 };
 
 typedef struct Ram Ram;
@@ -32,11 +33,24 @@ typedef struct Network Network;
 struct Network {
     long totalDown;
     long totalUp;
+    long debitDown;
+    long debitUp;
 };
 
-Cpu cpuCheck(void);
-Ram ramCheck(void);
-Swap swapCheck(void);
-Network networkCheck(void);
+typedef struct Capteur Capteur;
+struct Capteur {
+    Cpu cpu;
+    Ram ram;
+    Swap swap;
+    Network net;
+    long time;
+};
+
+Cpu cpuCheck();
+Ram ramCheck();
+Swap swapCheck();
+Network networkCheck();
+void capteurCheck(Capteur*);
+void calcCpuPcent(Cpu*, Cpu*);
 
 # endif /* __CAPTEUR__ */
