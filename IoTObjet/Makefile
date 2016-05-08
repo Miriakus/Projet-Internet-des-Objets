@@ -6,7 +6,6 @@ capteur.o : capteur.c capteur.h
 
 objet.o : objet.c capteur.h
 	gcc -c objet.c
-#	cc -c -DDEBUG -DDEBUG1 -DDEBUG2 fork4.c
 
 clean :
 	rm -f objet *.o

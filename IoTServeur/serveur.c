@@ -8,12 +8,12 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
-#include <time.h>
+#include <unistd.h>
 #include <pthread.h>
 
 #include "capteur.h"
 
-#define LBUF 512
+#define LBUF 1024
 
 typedef struct Store Store;
 struct Store {
@@ -23,7 +23,7 @@ struct Store {
     pthread_mutex_t mutexCapteur;
     char* address;
     char* port;
-    unsigned int frequence;
+    unsigned int frequence;         // millisecondes
 
     Capteur capteur;
     Capteur capteurOld;
@@ -31,7 +31,7 @@ struct Store {
 
 static Store store =
 {
-    .frequence = 1000,       // millisecondes
+    .frequence = 1000,
     .mutexCapteur = PTHREAD_MUTEX_INITIALIZER
 };
 
@@ -46,32 +46,34 @@ static void * threadCapteur (void *data)
     int isFirst = 1;
     Capteur *capteur = &store.capteur;
     Capteur *capteurOld = &store.capteurOld;
+    clock_t timer;
 
     while (1) {
+        timer = clock();
         /* Debut de la zone protegee. */
         pthread_mutex_lock (& store.mutexCapteur);
 
-        if (!isFirst)
-            memcpy(capteurOld, capteur, sizeof *capteurOld);
-        else
+        if (isFirst) {
             isFirst = 0;
-		capteurCheck(capteur);
-		calcCpuPcent(&capteur->cpu, &capteurOld->cpu);
+            capteurCheck(capteur);
 
-        store.capteur.net.debitDown = (long) ((double) (store.capteur.net.totalDown - store.capteurOld.net.totalDown) /(double)( (double) (store.frequence)/1000));
-        store.capteur.net.debitUp = (long) ((double) (store.capteur.net.totalUp - store.capteurOld.net.totalUp) / (double)( (double) (store.frequence)/1000));
+            capteur->cpu.pcentUsed = 0.;
+            capteur->disk.debitRead = 0;
+            capteur->disk.debitWrite = 0;
+            capteur->disk.pcentActive = 0.;
+            capteur->network.debitDown = 0;
+            capteur->network.debitUp = 0;
+        } else {
+            memcpy(capteurOld, capteur, sizeof *capteurOld);
+            capteurCheck(capteur);
 
-		//printf("----------------------------------------------------------\n");
-		//printf("Le taux processeur est de %g\n", store.capteur.cpu.pcentUsed);
-		//printf("L'utilisation de la RAM est de %g % (%ld/%ld Mo)\n", ram.pcentUsed, ram.used / 1024, ram.total / 1024);
-		//printf("L'utilisation du Swap est de %g % (%ld/%ld Mo)\n", swap.pcentUsed, swap.used / 1024, swap.total / 1024);
-		//printf("Le trafic reseau total est de %g Mo en DL et de %g Mo en UL\n", (double) net.totalDown/1024/1024, (double) net.totalUp/1024/1024);
-		//printf("Le trafic reseau est de %g Mo/s en DL et de %g Mo/s en UL\n",
-        //    (double) store.capteur.net.debitDown/1024/1024, (double) store.capteur.net.debitUp/1024/1024);
-		//printf("time %d\n", time(NULL));
+            calcCpuPcent(&capteur->cpu, &capteurOld->cpu);
+            calcDiskDebit(&capteur->disk, &capteurOld->disk, store.frequence);
+            calcNetworkDebit(&capteur->network, &capteurOld->network, store.frequence);
+        }
 		pthread_mutex_unlock (& store.mutexCapteur);
-        /* Fin de la zone protegee. */
-		usleep(store.frequence * 1000);
+		/* Fin de la zone protegee. */
+		usleep(store.frequence * 1000 - (clock()-timer));
    }
    return NULL;
 }
@@ -100,12 +102,21 @@ void service(int sid)
 
     /* Debut de la zone protegee. */
     pthread_mutex_lock (& store.mutexCapteur);
-    sprintf(data, "{\"cpu\": { \"user\": %ld, \"nice\": %ld, \"system\": %ld, \"idle\": %ld, \"pcentUsed\": %g },\"ram\": { \"total\": %ld, \"free\": %ld, \"buffers\": %ld, \"cached\": %ld, \"used\": %ld, \"pcentUsed\": %g },\"swap\": { \"total\": %ld, \"free\": %ld, \"cached\": %ld, \"used\": %ld, \"pcentUsed\": %g },\"network\": { \"totalDown\": %ld, \"totalUp\": %ld, \"debitDown\": %ld, \"debitUp\": %ld },\"time\": %ld}",
-        store.capteur.cpu.user, store.capteur.cpu.nice, store.capteur.cpu.system, store.capteur.cpu.idle, store.capteur.cpu.pcentUsed,
-        store.capteur.ram.total, store.capteur.ram.free, store.capteur.ram.buffers, store.capteur.ram.cached, store.capteur.ram.used, store.capteur.ram.pcentUsed,
-        store.capteur.swap.total, store.capteur.swap.free, store.capteur.swap.cached, store.capteur.swap.used, store.capteur.swap.pcentUsed,
-        store.capteur.net.totalDown, store.capteur.net.totalUp, store.capteur.net.debitDown, store.capteur.net.debitUp,
+
+    Cpu *cpu = &store.capteur.cpu;
+    Ram *ram = &store.capteur.ram;
+    Swap *swap = &store.capteur.swap;
+    Disk *disk = &store.capteur.disk;
+    Network *network = &store.capteur.network;
+
+    sprintf(data, "{ \"cpu\": { \"user\": %ld, \"nice\": %ld, \"system\": %ld, \"idle\": %ld, \"pcentUsed\": %g }, \"ram\": { \"total\": %ld, \"free\": %ld, \"buffers\": %ld, \"cached\": %ld, \"used\": %ld, \"pcentUsed\": %g }, \"swap\": { \"total\": %ld, \"free\": %ld, \"cached\": %ld, \"used\": %ld, \"pcentUsed\": %g }, \"disk\": { \"totalRead\": %ld, \"totalWrite\": %ld, \"totalTimeActive\": %ld, \"debitRead\": %ld, \"debitWrite\": %ld, \"pcentActive\": %g }, \"network\": { \"totalDown\": %ld, \"totalUp\": %ld, \"debitDown\": %ld, \"debitUp\": %ld },\"time\": %ld }",
+        cpu->user, cpu->nice, cpu->system, cpu->idle, cpu->pcentUsed,
+        ram->total, ram->free, ram->buffers, ram->cached, ram->used, ram->pcentUsed,
+        swap->total, swap->free, swap->cached, swap->used, swap->pcentUsed,
+        disk->totalRead, disk->totalWrite, disk->totalTimeActive, disk->debitRead, disk->debitWrite, disk->pcentActive,
+        network->totalDown, network->totalUp, network->debitDown, network->debitUp,
         store.capteur.time);
+
     pthread_mutex_unlock (& store.mutexCapteur);
     /* Fin de la zone protegee. */
     fprintf(stderr, "Emit : %s\n", data);
