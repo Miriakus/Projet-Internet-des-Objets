@@ -15,7 +15,7 @@
 #include "capteur.h"
 #include "serveur.h"
 
-#define LBUF 1024
+#define LBUF 2048
 
 static Store store =
 {
