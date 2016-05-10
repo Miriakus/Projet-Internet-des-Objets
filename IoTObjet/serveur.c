@@ -3,7 +3,7 @@
 #include "serveur.h"
 #include "capteur.h"
 
-void analyseRequest(char *request, char *response, Store *store)
+void analyseRequest(char *request, char *response, Store *store, int sid)
 {
     char* params[255];
     int nbParams = splitParams(request, params);
@@ -12,10 +12,35 @@ void analyseRequest(char *request, char *response, Store *store)
         return;
     }
     if (strcmp(params[0], "CAPT_JSON") == 0) {
+        /* Debut de la zone protegee. */
+        pthread_mutex_lock (&store->mutexCapteur);
         printJSON(response, &store->capteur);
+        pthread_mutex_unlock (&store->mutexCapteur);
+        /* Fin de la zone protegee. */
+    }
+    else if (strcmp(params[0], "CAPT_JSON_INTERVAL") == 0) {
+        while (1) {
+            /* Debut de la zone protegee. */
+            pthread_mutex_lock (&store->mutexCapteur);
+            printJSON(response, &store->capteur);
+            pthread_mutex_unlock (&store->mutexCapteur);
+            /* Fin de la zone protegee. */
+            if (write(sid,response, strlen(response)) < 0) {
+                close(sid);
+                perror("writeResponceInterval");
+                return;
+            }
+            fprintf(stderr, "Emit Interval : %s\n", response);
+            sleep(1);
+        }
     }
     else {
         sprintf(response, "ERROR : Bad request !");
+    }
+    if (write(sid,response, strlen(response)) < 0) {
+        close(sid);
+        perror("writeResponce");
+        return NULL;
     }
 }
 int splitParams(char *request, char **params)

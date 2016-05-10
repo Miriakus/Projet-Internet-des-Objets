@@ -86,20 +86,10 @@ static void * threadTCP(void *params)
     }
     fprintf(stderr, "Recu : %s\n", request);
 
-    /* Debut de la zone protegee. */
-    pthread_mutex_lock (&store.mutexCapteur);
+    analyseRequest(request, response, &store, sid);
 
-    analyseRequest(request, response, &store);
-
-    pthread_mutex_unlock (&store.mutexCapteur);
-    /* Fin de la zone protegee. */
     fprintf(stderr, "Emit : %s\n", response);
 
-    if (write(sid,response, strlen(response)) < 0) {
-        close(sid);
-        perror("writeResponce");
-        return NULL;
-    }
     close(sid);
     return NULL;
 }
