@@ -50,7 +50,6 @@ function reload() {
         ['Download', receiveData.data.network.debitDown / 1000000],
         ['Upload', receiveData.data.network.debitUp / 1000000]
 
-
     ]);
     chart = new google.visualization.Gauge(document.getElementById('chart_div'));
     chart.draw(data, options);

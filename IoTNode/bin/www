@@ -93,6 +93,7 @@ function onListening() {
 }
 
 
+
 io.sockets.on('connection', function (socket) {
     console.log("un client est connecté");
 });
@@ -107,23 +108,24 @@ function connectionToServe(){
     });
     client.on('data', (data) => {
         var values = JSON.parse(data.toString());
-        io.sockets.emit('message', {data: {cpu: values.cpu, ram:values.ram, swap:values.swap,
-            disk: values.disk, network: values.network}});
-        client.end();
+        io.sockets.emit('message', {data: values});
     });
 
     client.on('error', function (err) {
         console.log("Connection failed");
-        connectionToServe();
+        setTimeout(function(){
+            connectionToServe()
+        }, 10000)
     });
 
-    /*client.on('end', () => {
-        connectionToServe()
-    });*/
+    client.on('end', () => {
+        setTimeout(function(){
+            connectionToServe()
+        }, 10000)
+    });
 }
-setInterval(function(){
-    connectionToServe();
-},1000);
+
+connectionToServe();
 
 
 
