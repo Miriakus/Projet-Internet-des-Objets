@@ -20,11 +20,5 @@ struct Store {
     Capteur capteurOld;
 };
 
-static Store store =
-{
-    .frequence = 1000,
-    .mutexCapteur = PTHREAD_MUTEX_INITIALIZER
-};
-
 # endif /* __MAIN__ */
 

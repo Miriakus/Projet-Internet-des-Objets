@@ -17,6 +17,12 @@
 
 #define LBUF 1024
 
+static Store store =
+{
+    .frequence = 1000,
+    .mutexCapteur = PTHREAD_MUTEX_INITIALIZER
+};
+
 void error(const char *msg)
 {
     perror(msg);
@@ -87,8 +93,6 @@ static void * threadTCP(void *params)
     fprintf(stderr, "Recu : %s\n", request);
 
     analyseRequest(request, response, &store, sid);
-
-    fprintf(stderr, "Emit : %s\n", response);
 
     close(sid);
     return NULL;

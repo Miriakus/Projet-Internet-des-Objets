@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <string.h>
+#include <unistd.h>
 
 #include "serveur.h"
 #include "capteur.h"
@@ -40,8 +42,9 @@ void analyseRequest(char *request, char *response, Store *store, int sid)
     if (write(sid,response, strlen(response)) < 0) {
         close(sid);
         perror("writeResponce");
-        return NULL;
+        return;
     }
+    fprintf(stderr, "Emit : %s\n", response);
 }
 int splitParams(char *request, char **params)
 {
