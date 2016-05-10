@@ -4,7 +4,6 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-//var net = require('net');
 
 var app = express();
 
@@ -66,20 +65,5 @@ app.use(function (err, req, res, next) {
     });
 });
 
-
-/*var p = new Promise(function (resolve, reject) {
-    net.createServer(function (socket) {
-        socket.on('data', function (data) {
-
-        })
-    }).listen(5000);
-    resolve()
-});
-
-p.then(function(){
-    io.sockets.on('connection', function (socket) {
-        console.log("un client est connecté");
-    });
-});*/
 
 module.exports = app;

@@ -99,13 +99,16 @@ io.sockets.on('connection', function (socket) {
 
 function connectionToServe(){
 
-    const client = net.connect(42000, '82.123.161.192', () => {
-        client.write('DONNE MOI DES DONNEES!!! RAAAAAAAAAAAAAAAHHH!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n');
+    const client = net.connect(42000, '10.75.0.100');
+
+    client.on('connect', () =>{
+        client.write('CAPT_JSON_INTERVAL\n');
+
     });
     client.on('data', (data) => {
         var values = JSON.parse(data.toString());
         io.sockets.emit('message', {data: {cpu: values.cpu, ram:values.ram, swap:values.swap,
-            disk:  5 * Math.random(), network: values.network}});
+            disk: values.disk, network: values.network}});
         client.end();
     });
 

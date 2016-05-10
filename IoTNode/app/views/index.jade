@@ -3,6 +3,29 @@ extends layout
 block content
     p Task Manager
         //div(id = 'curve_chart' style="width: 1500px; height: 500px")
-        div(id="chart_div" style="width: 700px; height: 120px")
+        div(id="chart_div" style="width: 700px; height: 300px")
+        table(id = "info")
+            thead
+                tr
+                    td
+                        button(data-value="cpu") +INFO
+                    td
+                        button(data-value="ram") +INFO
+                    td
+                        button(data-value="swap") +INFO
+                    td
+                        button(data-value="disk") +INFO
+                    td
+                        button(data-value="download") +INFO
+                    td
+                        button(data-value="upload") +INFO
+            tbody
+                tr
+                    td(id = "cpu" class="hide")
+                    td(id = "ram" class="hide")
+                    td(id = "swap" class="hide")
+                    td(id= "disk" class="hide")
+                    td(id= "download" class="hide")
+                    td(id= "upload" class= "hide")
 
 
