@@ -5,6 +5,8 @@
 #include "serveur.h"
 #include "capteur.h"
 
+#define LBUF 1024
+
 void analyseRequest(char *request, char *response, Store *store, int sid)
 {
     char* params[255];
@@ -21,12 +23,14 @@ void analyseRequest(char *request, char *response, Store *store, int sid)
         /* Fin de la zone protegee. */
     }
     else if (strcmp(params[0], "CAPT_JSON_INTERVAL") == 0) {
+        char json[LBUF];
         while (1) {
             /* Debut de la zone protegee. */
             pthread_mutex_lock (&store->mutexCapteur);
-            printJSON(response, &store->capteur);
+            printJSON(json, &store->capteur);
             pthread_mutex_unlock (&store->mutexCapteur);
             /* Fin de la zone protegee. */
+            sprintf(response, "<start|%s|end>", json);
             if (write(sid,response, strlen(response)) < 0) {
                 close(sid);
                 perror("writeResponceInterval");
