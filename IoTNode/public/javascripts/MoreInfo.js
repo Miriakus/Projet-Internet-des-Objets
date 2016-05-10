@@ -79,7 +79,7 @@ function moreInfo() {
         if($('td#upload').is(':visible')){
             showUploadInfo()
         }
-    })
+    },1000)
 }
 
 

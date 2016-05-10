@@ -7,8 +7,6 @@ var bodyParser = require('body-parser');
 
 var app = express();
 
-var mongoose = require('mongoose');
-
 var routes = require('./app/routes/index');
 var users = require('./app/routes/users');
 
@@ -16,12 +14,6 @@ var users = require('./app/routes/users');
 // view engine setup
 app.set('views', path.join(__dirname, 'app/views'));
 app.set('view engine', 'jade');
-
-mongoose.connect('mongodb://localhost/bdd', function (err) {
-    if (err) {
-        throw err;
-    }
-});
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));

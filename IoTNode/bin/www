@@ -92,6 +92,18 @@ function onListening() {
     debug('Listening on ' + bind);
 }
 
+require('../app/models/StatisticsObject');
+var mongoose = require('mongoose');
+
+
+mongoose.connect('mongodb://localhost/bdd', function (err) {
+    if (err) {
+        throw err;
+    }
+});
+var statisticsObject = mongoose.model('StatisticsObject');
+
+var counterToSaveInBase = 0;
 
 
 io.sockets.on('connection', function (socket) {
@@ -103,12 +115,24 @@ function connectionToServe(){
     const client = net.connect(42000, '10.75.0.100');
 
     client.on('connect', () =>{
+        console.log('connected to serve');
         client.write('CAPT_JSON_INTERVAL\n');
 
     });
     client.on('data', (data) => {
-        var values = JSON.parse(data.toString());
-        io.sockets.emit('message', {data: values});
+        counterToSaveInBase++;
+        data = /<start\|(.*?)\|end>/g.exec(data.toString());
+        if (data) {
+            var values = JSON.parse(data[1]);
+            io.sockets.emit('message', {data: values});
+        }
+        if(counterToSaveInBase>=60){
+            counterToSaveInBase = 0;
+            statisticsObject(values).save(function(err, save) {
+                if (err) return console.error(err);
+                console.dir(save);
+            });
+        }
     });
 
     client.on('error', function (err) {
