@@ -47,6 +47,12 @@ struct Network {
     long debitUp;           // o/s
 };
 
+typedef struct Time Time;
+struct Time {
+    long sec;
+    long microsec;
+};
+
 typedef struct Capteur Capteur;
 struct Capteur {
     Cpu cpu;
@@ -54,7 +60,7 @@ struct Capteur {
     Swap swap;
     Disk disk;
     Network network;
-    long time;
+    Time time;
 };
 
 Cpu cpuCheck();
@@ -68,5 +74,6 @@ void calcCpuPcent(Cpu*, Cpu*);
 void calcDiskDebit(Disk*, Disk*, unsigned int);
 void calcNetworkDebit(Network*, Network*, unsigned int);
 long calcDebit(long, long, unsigned int);
+void printJSON(char*, Capteur*);
 
 # endif /* __CAPTEUR__ */

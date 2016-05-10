@@ -122,12 +122,17 @@ Network networkCheck()
 
 void capteurCheck(Capteur *capteur)
 {
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+
     capteur->cpu = cpuCheck();
     capteur->ram = ramCheck();
     capteur->swap = swapCheck();
     capteur->disk = diskCheck();
     capteur->network = networkCheck();
-    capteur->time = time(NULL);
+    capteur->time.sec = (long) tv.tv_sec;
+    capteur->time.microsec = (long) tv.tv_usec;
+
 }
 
 void calcCpuPcent(Cpu *cpu, Cpu *cpuOld)
@@ -159,4 +164,22 @@ void calcNetworkDebit(Network *network, Network *networkOld, unsigned int freque
 long calcDebit(long total, long totalOld, unsigned int frequence)
 {
     return (long) ((double) (total - totalOld) / (double) ((double) frequence / 1000));
+}
+
+
+void printJSON(char *json, Capteur *capteur)
+{
+    Cpu *cpu = &capteur->cpu;
+    Ram *ram = &capteur->ram;
+    Swap *swap = &capteur->swap;
+    Disk *disk = &capteur->disk;
+    Network *network = &capteur->network;
+
+    sprintf(json, "{ \"cpu\": { \"user\": %ld, \"nice\": %ld, \"system\": %ld, \"idle\": %ld, \"pcentUsed\": %g }, \"ram\": { \"total\": %ld, \"free\": %ld, \"buffers\": %ld, \"cached\": %ld, \"used\": %ld, \"pcentUsed\": %g }, \"swap\": { \"total\": %ld, \"free\": %ld, \"cached\": %ld, \"used\": %ld, \"pcentUsed\": %g }, \"disk\": { \"totalRead\": %ld, \"totalWrite\": %ld, \"totalTimeActive\": %ld, \"debitRead\": %ld, \"debitWrite\": %ld, \"pcentActive\": %g }, \"network\": { \"totalDown\": %ld, \"totalUp\": %ld, \"debitDown\": %ld, \"debitUp\": %ld },\"time\": { \"sec\": %ld, \"microsec\": %ld } }",
+        cpu->user, cpu->nice, cpu->system, cpu->idle, cpu->pcentUsed,
+        ram->total, ram->free, ram->buffers, ram->cached, ram->used, ram->pcentUsed,
+        swap->total, swap->free, swap->cached, swap->used, swap->pcentUsed,
+        disk->totalRead, disk->totalWrite, disk->totalTimeActive, disk->debitRead, disk->debitWrite, disk->pcentActive,
+        network->totalDown, network->totalUp, network->debitDown, network->debitUp,
+        capteur->time.sec, capteur->time.microsec);
 }
