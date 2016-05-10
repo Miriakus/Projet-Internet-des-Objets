@@ -7,8 +7,6 @@
 var app = require('../app');
 var debug = require('debug')('IoTNode:server');
 var http = require('http');
-var net = require('net');
-
 
 /**
  * Get port from environment and store in Express.
@@ -24,6 +22,9 @@ app.set('port', port);
 var server = http.createServer(app);
 
 var io = require('socket.io').listen(server);
+
+require('../app/IOTNodeConnection').init(io);
+
 /**
  * Listen on provided port, on all network interfaces.
  */
@@ -91,71 +92,3 @@ function onListening() {
         : 'port ' + addr.port;
     debug('Listening on ' + bind);
 }
-
-require('../app/models/StatisticsObject');
-var mongoose = require('mongoose');
-
-
-mongoose.connect('mongodb://localhost/bdd', function (err) {
-    if (err) {
-        throw err;
-    }
-});
-var statisticsObject = mongoose.model('StatisticsObject');
-
-var oldTimeDataReceived = 0;
-
-
-io.sockets.on('connection', function (socket) {
-    console.log("un client est connecté");
-});
-
-function saveToBdd(values) {
-    if (values.time.sec - oldTimeDataReceived >= 60) {
-        statisticsObject(values).save(function (err, save) {
-            console.log('saved');
-            if (err) return console.error('fail to save data');
-        });
-        oldTimeDataReceived = values.time.sec;
-    }
-}
-function checkData(data) {
-    data = /<start\|(.*?)\|end>/g.exec(data.toString());
-    return data;
-}
-function connectionToServe(){
-
-    const client = net.connect(42000, '10.75.0.100');
-
-    client.on('connect', () =>{
-        console.log('connected to serve');
-        client.write('CAPT_JSON_INTERVAL\n');
-
-    });
-    client.on('data', (data) => {
-        data = checkData(data);
-        if (data) {
-            var values = JSON.parse(data[1]);
-            io.sockets.emit('message', {data: values});
-        }
-        saveToBdd(values);
-    });
-
-    client.on('error', function (err) {
-        console.log("Connection failed");
-        setTimeout(function(){
-            connectionToServe()
-        }, 10000)
-    });
-
-    client.on('end', () => {
-        setTimeout(function(){
-            connectionToServe()
-        }, 10000)
-    });
-}
-
-connectionToServe();
-
-
-
