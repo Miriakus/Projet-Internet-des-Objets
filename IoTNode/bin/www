@@ -103,13 +103,26 @@ mongoose.connect('mongodb://localhost/bdd', function (err) {
 });
 var statisticsObject = mongoose.model('StatisticsObject');
 
-var counterToSaveInBase = 0;
+var oldTimeDataReceived = 0;
 
 
 io.sockets.on('connection', function (socket) {
     console.log("un client est connecté");
 });
 
+function saveToBdd(values) {
+    if (values.time.sec - oldTimeDataReceived >= 60) {
+        statisticsObject(values).save(function (err, save) {
+            console.log('saved');
+            if (err) return console.error('fail to save data');
+        });
+        oldTimeDataReceived = values.time.sec;
+    }
+}
+function checkData(data) {
+    data = /<start\|(.*?)\|end>/g.exec(data.toString());
+    return data;
+}
 function connectionToServe(){
 
     const client = net.connect(42000, '10.75.0.100');
@@ -120,19 +133,12 @@ function connectionToServe(){
 
     });
     client.on('data', (data) => {
-        counterToSaveInBase++;
-        data = /<start\|(.*?)\|end>/g.exec(data.toString());
+        data = checkData(data);
         if (data) {
             var values = JSON.parse(data[1]);
             io.sockets.emit('message', {data: values});
         }
-        if(counterToSaveInBase>=60){
-            counterToSaveInBase = 0;
-            statisticsObject(values).save(function(err, save) {
-                if (err) return console.error(err);
-                console.dir(save);
-            });
-        }
+        saveToBdd(values);
     });
 
     client.on('error', function (err) {
