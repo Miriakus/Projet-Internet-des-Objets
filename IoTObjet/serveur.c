@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -24,10 +25,14 @@ void analyseRequest(char *request, char *response, Store *store, int sid)
     }
     else if (strcmp(params[0], "CAPT_JSON_INTERVAL") == 0) {
         char json[LBUF];
+        clock_t timer;
+        unsigned int frequence;
         while (1) {
+            timer = clock();
             /* Debut de la zone protegee. */
             pthread_mutex_lock (&store->mutexCapteur);
             printJSON(json, &store->capteur);
+            frequence = store->frequence;
             pthread_mutex_unlock (&store->mutexCapteur);
             /* Fin de la zone protegee. */
             sprintf(response, "<start|%s|end>", json);
@@ -37,8 +42,19 @@ void analyseRequest(char *request, char *response, Store *store, int sid)
                 return;
             }
             fprintf(stderr, "Emit Interval : %s\n", response);
-            sleep(1);
+            usleep(frequence * 1000 - (clock()-timer));
         }
+    }
+    else if (strcmp(params[0], "CH_FREQ") == 0 && nbParams == 2) {
+        /* Debut de la zone protegee. */
+        pthread_mutex_lock (&store->mutexCapteur);
+        if (strtol(params[1], NULL, 0) >= 100) {
+            store->frequence = (unsigned int) strtol(params[1], NULL, 0);
+            sprintf(response, "La frequence est maintenant de %d", store->frequence);
+        } else
+            sprintf(response, "Valeur incorrecte, la frequence est de %d", store->frequence);
+        pthread_mutex_unlock (&store->mutexCapteur);
+        /* Fin de la zone protegee. */
     }
     else {
         sprintf(response, "ERROR : Bad request !");

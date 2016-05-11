@@ -35,9 +35,14 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="capteur.h" />
-		<Unit filename="objet.c">
+		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="main.h" />
+		<Unit filename="serveur.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="serveur.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />

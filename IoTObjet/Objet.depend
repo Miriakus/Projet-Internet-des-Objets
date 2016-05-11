@@ -1,9 +1,9 @@
 # depslib dependency file v1.0
-1462887129 source:/home/leo/Documents/Projet-Internet-des-Objets/IoTObjet/capteur.c
+1462950021 source:/home/leo/Documents/Projet-Internet-des-Objets/IoTObjet/capteur.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
-	<time.h>
+	<sys/time.h>
 	"capteur.h"
 
 1462800938 /home/leo/Documents/Projet-Internet-des-Objets/IoTObjet/capteur.h
@@ -23,8 +23,9 @@
 1462808214 /home/leo/Documents/Projet-Internet-des-Objets/IoTObjet/serveur.c
 	<stdio.h>
 
-1462887089 source:/home/leo/Documents/Projet-Internet-des-Objets/IoTObjet/serveur.c
+1462949882 source:/home/leo/Documents/Projet-Internet-des-Objets/IoTObjet/serveur.c
 	<stdio.h>
+	<stdlib.h>
 	<string.h>
 	<unistd.h>
 	"serveur.h"
@@ -45,7 +46,7 @@
 	"capteur.h"
 	"serveur.h"
 
-1462887057 source:/home/leo/Documents/Projet-Internet-des-Objets/IoTObjet/main.c
+1462892904 source:/home/leo/Documents/Projet-Internet-des-Objets/IoTObjet/main.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>

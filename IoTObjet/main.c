@@ -35,6 +35,7 @@ static void * threadCapteur(void *params)
     Capteur *capteur = &store.capteur;
     Capteur *capteurOld = &store.capteurOld;
     clock_t timer;
+    unsigned int frequence;
 
     while (1) {
         timer = clock();
@@ -59,11 +60,12 @@ static void * threadCapteur(void *params)
             calcDiskDebit(&capteur->disk, &capteurOld->disk, store.frequence);
             calcNetworkDebit(&capteur->network, &capteurOld->network, store.frequence);
         }
-        //printf("sec : %ld , usec: %ld , diff: %ld\n", capteur->time.sec, capteur->time.microsec,
-        //    capteur->time.microsec-capteurOld->time.microsec);
+        frequence = store.frequence;
+        //printf("sec : %ld , usec: %ld , diff: %ld - %d\n", capteur->time.sec, capteur->time.microsec,
+        //    capteur->time.microsec-capteurOld->time.microsec, store.frequence);
 		pthread_mutex_unlock (&store.mutexCapteur);
 		/* Fin de la zone protegee. */
-		usleep(store.frequence * 1000 - (clock()-timer));
+		usleep(frequence * 1000 - (clock()-timer));
    }
    return NULL;
 }
