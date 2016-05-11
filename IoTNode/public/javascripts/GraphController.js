@@ -4,34 +4,67 @@
 
 
 
-var cpuDatas = [0, 4, 0, 0, 3, 10, 45, 20, 3, 2, 2, 1, 4, 6, 2];
-var ramDatas = [48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 48, 60];
-var diskDatas = [0, 0, 0, 0, 0, 0, 4, 50, 20, 10, 3, 0, 0, 0, 0];
-var linkDatas = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+var cpuData = [];
+var ramData = [];
+var swapData = [];
+var diskData = [];
+var downloadData = [];
+var uploadData = [];
 
-var receiveDatas = [];
+var receiveData = [];
 var chart;
 var options = {
-    title: 'Company Performance',
+    title: 'graph stat',
     curveType: 'function',
-    legend: { position: 'bottom' }
+    legend: {position: 'bottom'}
 };
 
 var baseArray = [];
 var cpt = 0;
 
-google.charts.load('current', {'packages':['corechart']});
-google.charts.setOnLoadCallback(drawChart);
 
-var socket = io('http://localhost:3000');
-socket.on('message', function (datas) {
-    receiveDatas = datas;
-    reload()
-});
+/*var graph = {
+    drawChart: function () {
+        var array = graphTab();
+        var data = google.visualization.arrayToDataTable(array);
+
+        chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+        chart.draw(data, options);
+    },
+
+    updateDataGraph: function(newCpuValue, newRamValue, newDiskValue, newLinkValue){
+        cpuDatas.push(newCpuValue);
+        ramDatas.push(newRamValue);
+        diskDatas.push(newDiskValue);
+        linkDatas.push(newLinkValue);
+    },
+
+    graphTab: function(){
+        var graphTab = [];
+        graphTab.push(['i', 'CPU', 'RAM', 'Disk', 'Link']);
+        for (var i = 0; i < cpuDatas.length; i++) {
+            graphTab.push([cpt, cpuDatas[i], ramDatas[i], diskDatas[i], linkDatas[i]]);
+            cpt++;
+        }
+        return graphTab;
+    },
+
+    reload: function(){
+        graph.updateDataGraph(receiveDatas.data[0], receiveDatas.data[1], receiveDatas.data[2], receiveDatas.data[3]);
+
+        var array = graph.graphTab();
+        var data = google.visualization.arrayToDataTable(array);
+
+        chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+
+        chart.draw(data, options);
+    }
 
 
+};
+*/
 
-function drawChart() {
+function drawChartGraph() {
     var array = graphTab();
     var data = google.visualization.arrayToDataTable(array);
 
@@ -40,7 +73,7 @@ function drawChart() {
 }
 
 
-function updateDataGraph(newCpuValue, newRamValue, newDiskValue, newLinkValue) {
+/*function updateDataGraph(newCpuValue, newRamValue, newDiskValue, newLinkValue) {
     if (cpuDatas.length >= 15) {
         cpuDatas.splice(0, 1);
         cpuDatas.push(newCpuValue);
@@ -60,21 +93,44 @@ function updateDataGraph(newCpuValue, newRamValue, newDiskValue, newLinkValue) {
         diskDatas.push(newDiskValue);
         linkDatas.push(newLinkValue);
     }
+
+}*/
+
+function updateDataGraph(values){
+    values.forEach(function(data){
+        cpuData.push(data.cpu.pcentUsed);
+        ramData.push(data.ram.pcentUsed);
+        swapData.push(data.swap.pcentUsed);
+        diskData.push(data.disk.pcentActive);
+        downloadData.push(data.network.debitDown);
+        uploadData.push(data.network.debitUp);
+
+        graphTab();
+    })
 }
 
 function graphTab() {
     var graphTab = [];
-    graphTab.push(['i', 'CPU', 'RAM', 'Disk', 'Link']);
-    for (var i = 0; i < cpuDatas.length; i++) {
-        graphTab.push([cpt, cpuDatas[i], ramDatas[i], diskDatas[i], linkDatas[i]]);
+    graphTab.push(['i', 'CPU', 'RAM','SWAP','Disk', 'Download', 'Upload']);
+    for (var i = 0; i < cpuData.length; i++) {
+        graphTab.push([cpt, cpuData[i], ramData[i], swapData[i], diskData[i], downloadData[i], uploadData[i]]);
         cpt++;
     }
+    console.log(graphTab);
     return graphTab;
 }
 
+function drawGraph(values){
+    updateDataGraph(values);
+    google.charts.load('current', {'packages': ['corechart']});
+    google.charts.setOnLoadCallback(drawChartGraph);
+}
 
-function reload(){
-    updateDataGraph(receiveDatas.data[0], receiveDatas.data[1], receiveDatas.data[2], receiveDatas.data[3]);
+if(showGraph){
+    drawGraph(values)
+}
+
+/*function reload() {
 
     var array = graphTab();
     var data = google.visualization.arrayToDataTable(array);
@@ -82,15 +138,8 @@ function reload(){
     chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
 
     chart.draw(data, options);
-}
+}*/
 
-var i = 0;
-/*var interval = setInterval(function(){
-    reload();
-    i++;
-    if (i == 15){
-        clearInterval(interval)
-    }
+//module.exports = graph;
 
-},1000);*/
 

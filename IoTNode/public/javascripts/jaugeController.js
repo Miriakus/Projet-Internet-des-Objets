@@ -47,8 +47,8 @@ function reload() {
         ['RAM', receiveData.data.ram.pcentUsed],
         ['Swap', receiveData.data.swap.pcentUsed],
         ['Disk', receiveData.data.disk.pcentActive],
-        ['Download', receiveData.data.network.debitDown / 1000000],
-        ['Upload', receiveData.data.network.debitUp / 1000000]
+        ['Download', receiveData.data.network.debitDown / 1000000 *8],
+        ['Upload', receiveData.data.network.debitUp / 1000000 * 8]
 
     ]);
     chart = new google.visualization.Gauge(document.getElementById('chart_div'));

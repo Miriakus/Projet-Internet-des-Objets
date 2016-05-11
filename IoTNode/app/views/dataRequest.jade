@@ -1,0 +1,31 @@
+extends layoutDataRequest
+
+block content
+    script(type = "text/javascript").
+        var showGraph = showGraph;
+        var values = values;
+
+    script(src = '../../javascripts/GraphController.js')
+    -if(!showGraph)
+        form.form-horizontal(action='/dataRequest', name='search', role='form', method='post', accept-charset='utf-8')
+            .row
+                .col-md-offset-2.col-md-8
+                    .form-group
+                        label Date
+                        input.form-control(type='date', name='date')
+            .row
+                .col-md-offset-2.col-md-3
+                    .form-group
+                        label  Heure de debut
+                        input.form-control(type='time', name='beginHour')
+                .col-md-offset-2.col-md-3
+                    .form-group
+                        label Heure de fin
+                        input.form-control(type='time', name='lastHour')
+            .container-fluid
+                .row
+                    .col-sm-12
+                        div
+                            input.btn.btn-secondary.btn-fat(type='submit', value='Rechercher', style='text-align:center')
+
+    div(id = 'curve_chart' style="width: 1500px; height: 500px")

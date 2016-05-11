@@ -2,6 +2,7 @@ require('../app/models/StatisticsObject');
 var net = require('net');
 var mongoose = require('mongoose');
 var statisticsObject = mongoose.model('StatisticsObject');
+
 var io;
 
 var oldTimeDataReceived = 0;
@@ -11,6 +12,7 @@ var IOTNodeConnection = {
         io = IO;
         IOTNodeConnection.connectionToServe();
     },
+
     saveToDatabase : function (values) {
         if (values.time.sec - oldTimeDataReceived >= 60) {
             statisticsObject(values).save(function (err, save) {
@@ -27,7 +29,7 @@ var IOTNodeConnection = {
     },
 
     connectionToServe: function(){
-        const client = net.connect(42000, '10.75.0.100');
+        const client = net.connect(42000, '82.123.161.192');
 
         client.on('connect', () =>{
             console.log('connected to serve');
@@ -56,8 +58,6 @@ var IOTNodeConnection = {
             }, 10000)
         });
     }
-
-
 };
 
 module.exports = IOTNodeConnection;
