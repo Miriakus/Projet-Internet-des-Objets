@@ -30,7 +30,7 @@ var IOTNodeConnection = {
     },
 
     connectionToServe: function(){
-        const client = net.connect(42000, '10.75.17.142');
+        const client = net.connect(42000, '82.123.161.192');
 
         client.on('connect', () =>{
             console.log('connected to serve');

@@ -5,51 +5,51 @@
 
 function showCPUInfo() {
     $('#cpu').html(`
-            user: ${receiveData.data.cpu.user} <br>
-            nice: ${receiveData.data.cpu.nice} <br>
-            system: ${receiveData.data.cpu.system} <br>
-            idle: ${receiveData.data.cpu.idle} <br>
-            pcentUsed: ${receiveData.data.cpu.pcentUsed} `);
+            user: ${receiveData.data.cpu.user} tick <br>
+            nice: ${receiveData.data.cpu.nice} tick <br>
+            system: ${receiveData.data.cpu.system} tick <br>
+            idle: ${receiveData.data.cpu.idle} tick <br>
+            pcentUsed: ${receiveData.data.cpu.pcentUsed} % `);
 }
 
 function showRamInfo() {
     $('#ram').html(`
-            total: ${receiveData.data.ram.total} <br>
-            free: ${receiveData.data.ram.free} <br>
-            cached: ${receiveData.data.ram.cached} <br>
-            used: ${receiveData.data.ram.used} <br>
-            pcentUsed: ${receiveData.data.ram.pcentUsed} `);
+            total: ${receiveData.data.ram.total} ko<br>
+            free: ${receiveData.data.ram.free} ko<br>
+            cached: ${receiveData.data.ram.cached} ko<br>
+            used: ${receiveData.data.ram.used} ko<br>
+            pcentUsed: ${receiveData.data.ram.pcentUsed} % `);
 }
 
 function showSwapInfo(){
     $('#swap').html(`
-        total: ${receiveData.data.swap.total} <br>
-        free: ${receiveData.data.swap.free} <br>
-        cached: ${receiveData.data.swap.cached} <br>
-        used: ${receiveData.data.swap.used} <br>
-        pcentUsed: ${receiveData.data.swap.pcentUsed} `);
+        total: ${receiveData.data.swap.total} ko <br>
+        free: ${receiveData.data.swap.free} ko <br>
+        cached: ${receiveData.data.swap.cached} ko <br>
+        used: ${receiveData.data.swap.used} ko <br>
+        pcentUsed: ${receiveData.data.swap.pcentUsed} % `);
 }
 
 function showDiskInfo(){
     $('#disk').html(`
-        totalRead: ${receiveData.data.disk.totalRead} <br>
-        totalWrite: ${receiveData.data.disk.totalWrite} <br>
-        totalTimeActive: ${receiveData.data.disk.totalTimeActive} <br>
-        debitRead: ${receiveData.data.disk.debitRead} <br>
-        debitWrite: ${receiveData.data.disk.debitWrite} <br>
-        pcentActive: ${receiveData.data.disk.pcentActive} `);
+        totalRead: ${receiveData.data.disk.totalRead} ko <br>
+        totalWrite: ${receiveData.data.disk.totalWrite} ko <br>
+        totalTimeActive: ${receiveData.data.disk.totalTimeActive} ms <br>
+        debitRead: ${receiveData.data.disk.debitRead} ko/s <br>
+        debitWrite: ${receiveData.data.disk.debitWrite} ko/s <br>
+        pcentActive: ${receiveData.data.disk.pcentActive} % `);
 }
 
 function showDownloadInfo(){
     $('#download').html(`
-        totalDown: ${receiveData.data.network.totalDown} <br>
-        debitDown: ${receiveData.data.network.debitDown} `);
+        totalDown: ${receiveData.data.network.totalDown} o <br>
+        debitDown: ${receiveData.data.network.debitDown} o/s `);
 }
 
 function showUploadInfo(){
     $('#upload').html(`
-        totalUp: ${receiveData.data.network.totalUp} <br>
-        debitUp: ${receiveData.data.network.debitUp} `);
+        totalUp: ${receiveData.data.network.totalUp} o <br>
+        debitUp: ${receiveData.data.network.debitUp} o/s `);
 }
 
 $('thead td button').on('click', function () {

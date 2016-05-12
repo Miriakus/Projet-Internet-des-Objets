@@ -11,7 +11,6 @@ function convertStringTimeToSec(time){
     var timeSplit = time.split(':');
     var hour = (timeSplit[0]-2) * 3600 ;
     var min = timeSplit[1] * 60;
-    console.log(min);
     return hour + min;
 }
 
@@ -25,11 +24,16 @@ var dataBaseRequests = {
         result.exec(function(err, values){
             values = JSON.stringify(values);
             if(err){
-                console.log('error');
                 values = JSON.stringify([{}]);
+                res.render('dataRequest', {error: true, values: values, showGraph: false})
+            }else{
+                if(values == "[]"){
+                    res.render('dataRequest', {noValue: true, values: values, showGraph: false});
+                }else{
+                    res.render('dataRequest', {values: values, showGraph: true});
+                }
             }
 
-            res.render('dataRequest', {values: values, showGraph: true});
         });
 
 

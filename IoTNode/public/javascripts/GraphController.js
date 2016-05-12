@@ -66,9 +66,6 @@ function graphTab() {
         graphTabNetwork.push([cpt, downloadData[i], uploadData[i]]);
         cpt++;
     }
-
-    console.log(graphInPcent);
-    console.log(graphTabNetwork);
 }
 
 function drawGraph(values){
@@ -77,7 +74,7 @@ function drawGraph(values){
     google.charts.setOnLoadCallback(drawChartGraph);
 }
 
-if(showGraph){
+if(showGraph && values.length > 0){
     console.log('ok');
     drawGraph(values)
 }
