@@ -6,6 +6,7 @@
 #include <QSlider>
 #include <QLCDNumber>
 #include <QTcpSocket>
+#include <QByteArray>
 
 class ControlPannel : public QWidget
 {
@@ -17,12 +18,16 @@ class ControlPannel : public QWidget
         QPushButton *m_buttonFreq;
         QLCDNumber *m_lcdNumber;
         QTcpSocket *m_sock;
+        QPushButton *m_buttonInfos;
+        QByteArray *m_readBuffer;
 
 
     signals:
 
     public slots:
         void changeFreq();
+        void resServer();
+        void reqInfos();
 
 };
 
