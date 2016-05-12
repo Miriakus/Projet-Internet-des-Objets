@@ -22,7 +22,11 @@ var dataBaseRequests = {
         var last = convertStringTimeToSec(req.body.lastHour) + date;
         var result = statisticsObject.find().where('time.sec').gt(begin).lt(last);
         result.exec(function(err, values){
-            console.log(values);
+            values = JSON.stringify(values);
+            if(values.length <= 0){
+                values = JSON.stringify([{}]);
+            }
+
             res.render('dataRequest', {values: values, showGraph: true});
         });
 

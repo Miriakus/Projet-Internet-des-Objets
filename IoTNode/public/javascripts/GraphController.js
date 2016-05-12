@@ -116,17 +116,18 @@ function graphTab() {
         graphTab.push([cpt, cpuData[i], ramData[i], swapData[i], diskData[i], downloadData[i], uploadData[i]]);
         cpt++;
     }
-    console.log(graphTab);
     return graphTab;
 }
 
 function drawGraph(values){
+    console.log("OKKKK");
     updateDataGraph(values);
     google.charts.load('current', {'packages': ['corechart']});
     google.charts.setOnLoadCallback(drawChartGraph);
 }
 
 if(showGraph){
+    console.log('ok');
     drawGraph(values)
 }
 

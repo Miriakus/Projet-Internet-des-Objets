@@ -10,7 +10,7 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/dataRequest', function(req, res, next){
-  res.render('dataRequest',{values: [], showGraph: false});
+  res.render('dataRequest',{values: JSON.stringify([{}]), showGraph: false});
 });
 
 router.post('/dataRequest', dataBaseRequest.search);

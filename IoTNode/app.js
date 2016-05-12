@@ -15,6 +15,7 @@ var users = require('./app/routes/users');
 app.set('views', path.join(__dirname, 'app/views'));
 app.set('view engine', 'jade');
 
+app.locals.pretty = true;
 mongoose.connect('mongodb://localhost/bdd', function (err) {
     if (err) {
         throw err;
