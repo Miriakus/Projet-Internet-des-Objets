@@ -1,5 +1,5 @@
 body {
-    padding: 50px;
+    padding: 100px;
     font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
@@ -26,6 +26,10 @@ button {
 
 tbody tr{
     text-align: center;
+}
+
+#chart_div{
+    margin-top: 100px;
 }
 
 
