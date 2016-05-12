@@ -56,6 +56,9 @@ void analyseRequest(char *request, char *response, Store *store, int sid)
         pthread_mutex_unlock (&store->mutexCapteur);
         /* Fin de la zone protegee. */
     }
+    else if (strcmp(params[0], "QUIT") == 0) {
+        exit(42);
+    }
     else {
         sprintf(response, "ERROR : Bad request !");
     }
