@@ -17,13 +17,15 @@ function convertStringTimeToSec(time){
 
 var dataBaseRequests = {
     search: function(req, res){
+
         var date = new Date(req.body.date).getTime() / 1000;
         var begin = convertStringTimeToSec(req.body.beginHour) + date;
         var last = convertStringTimeToSec(req.body.lastHour) + date;
         var result = statisticsObject.find().where('time.sec').gt(begin).lt(last);
         result.exec(function(err, values){
             values = JSON.stringify(values);
-            if(values.length <= 0){
+            if(err){
+                console.log('error');
                 values = JSON.stringify([{}]);
             }
 

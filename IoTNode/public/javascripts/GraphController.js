@@ -11,90 +11,38 @@ var diskData = [];
 var downloadData = [];
 var uploadData = [];
 
+var graphInPcent = [];
+var graphTabNetwork = [];
+
 var receiveData = [];
 var chart;
+var chart2;
 var options = {
-    title: 'graph stat',
+    title: 'graph %',
     curveType: 'function',
-    legend: {position: 'bottom'}
+    legend: {position: 'right'}
 };
 
+var options2 = {
+    title: 'graph network',
+    curveType:'function',
+    legend: {position:'right'}
+};
 var baseArray = [];
 var cpt = 0;
 
 
-/*var graph = {
-    drawChart: function () {
-        var array = graphTab();
-        var data = google.visualization.arrayToDataTable(array);
 
-        chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
-        chart.draw(data, options);
-    },
-
-    updateDataGraph: function(newCpuValue, newRamValue, newDiskValue, newLinkValue){
-        cpuDatas.push(newCpuValue);
-        ramDatas.push(newRamValue);
-        diskDatas.push(newDiskValue);
-        linkDatas.push(newLinkValue);
-    },
-
-    graphTab: function(){
-        var graphTab = [];
-        graphTab.push(['i', 'CPU', 'RAM', 'Disk', 'Link']);
-        for (var i = 0; i < cpuDatas.length; i++) {
-            graphTab.push([cpt, cpuDatas[i], ramDatas[i], diskDatas[i], linkDatas[i]]);
-            cpt++;
-        }
-        return graphTab;
-    },
-
-    reload: function(){
-        graph.updateDataGraph(receiveDatas.data[0], receiveDatas.data[1], receiveDatas.data[2], receiveDatas.data[3]);
-
-        var array = graph.graphTab();
-        var data = google.visualization.arrayToDataTable(array);
-
-        chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
-
-        chart.draw(data, options);
-    }
-
-
-};
-*/
 
 function drawChartGraph() {
-    var array = graphTab();
-    var data = google.visualization.arrayToDataTable(array);
-
+    var dataPcent = google.visualization.arrayToDataTable(graphInPcent);
+    var dataNetwork = google.visualization.arrayToDataTable(graphTabNetwork);
     chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
-    chart.draw(data, options);
+    chart2 = new google.visualization.LineChart(document.getElementById('curve_chart2'));
+    chart.draw(dataPcent, options);
+    chart2.draw(dataNetwork, options2);
 }
 
-
-/*function updateDataGraph(newCpuValue, newRamValue, newDiskValue, newLinkValue) {
-    if (cpuDatas.length >= 15) {
-        cpuDatas.splice(0, 1);
-        cpuDatas.push(newCpuValue);
-
-        ramDatas.splice(0, 1);
-        ramDatas.push(newRamValue);
-
-        diskDatas.splice(0, 1);
-        diskDatas.push(newDiskValue);
-
-        linkDatas.splice(0, 1);
-        linkDatas.push(newLinkValue);
-    }
-    else {
-        cpuDatas.push(newCpuValue);
-        ramDatas.push(newRamValue);
-        diskDatas.push(newDiskValue);
-        linkDatas.push(newLinkValue);
-    }
-
-}*/
 
 function updateDataGraph(values){
     values.forEach(function(data){
@@ -104,23 +52,26 @@ function updateDataGraph(values){
         diskData.push(data.disk.pcentActive);
         downloadData.push(data.network.debitDown);
         uploadData.push(data.network.debitUp);
-
-        graphTab();
-    })
+    });
+    graphTab();
 }
 
 function graphTab() {
-    var graphTab = [];
-    graphTab.push(['i', 'CPU', 'RAM','SWAP','Disk', 'Download', 'Upload']);
+
+
+    graphTabNetwork.push(['i', 'Download', 'Upload']);
+    graphInPcent.push(['i', 'CPU', 'RAM', 'SWAP', 'Disk']);
     for (var i = 0; i < cpuData.length; i++) {
-        graphTab.push([cpt, cpuData[i], ramData[i], swapData[i], diskData[i], downloadData[i], uploadData[i]]);
+        graphInPcent.push([cpt, cpuData[i], ramData[i], swapData[i], diskData[i]]);
+        graphTabNetwork.push([cpt, downloadData[i], uploadData[i]]);
         cpt++;
     }
-    return graphTab;
+
+    console.log(graphInPcent);
+    console.log(graphTabNetwork);
 }
 
 function drawGraph(values){
-    console.log("OKKKK");
     updateDataGraph(values);
     google.charts.load('current', {'packages': ['corechart']});
     google.charts.setOnLoadCallback(drawChartGraph);
@@ -131,16 +82,5 @@ if(showGraph){
     drawGraph(values)
 }
 
-/*function reload() {
-
-    var array = graphTab();
-    var data = google.visualization.arrayToDataTable(array);
-
-    chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
-
-    chart.draw(data, options);
-}*/
-
-//module.exports = graph;
 
 

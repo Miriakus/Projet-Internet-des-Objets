@@ -18,8 +18,9 @@ var IOTNodeConnection = {
             statisticsObject(values).save(function (err, save) {
                 console.log('saved');
                 if (err) return console.error('fail to save data');
+                oldTimeDataReceived = values.time.sec;
             });
-            oldTimeDataReceived = values.time.sec;
+
         }
     },
 
@@ -29,7 +30,7 @@ var IOTNodeConnection = {
     },
 
     connectionToServe: function(){
-        const client = net.connect(42000, '82.123.161.192');
+        const client = net.connect(42000, '10.75.17.142');
 
         client.on('connect', () =>{
             console.log('connected to serve');
@@ -41,8 +42,8 @@ var IOTNodeConnection = {
             if (data) {
                 var values = JSON.parse(data[1]);
                 io.sockets.emit('message', {data: values});
+                IOTNodeConnection.saveToDatabase(values);
             }
-            IOTNodeConnection.saveToDatabase(values);
         });
 
         client.on('error', function (err) {

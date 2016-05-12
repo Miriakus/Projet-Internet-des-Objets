@@ -60,6 +60,25 @@ $('thead td button').on('click', function () {
 
 function moreInfo() {
 
+    if($('td#cpu').is(':visible')){
+        showCPUInfo()
+    }
+    if($('td#ram').is(':visible')){
+        showRamInfo()
+    }
+    if($('td#swap').is(':visible')){
+        showSwapInfo()
+    }
+    if($('td#disk').is(':visible')){
+        showDiskInfo()
+    }
+    if($('td#download').is(':visible')){
+        showDownloadInfo()
+    }
+    if($('td#upload').is(':visible')){
+        showUploadInfo()
+    }
+
     setInterval(function(){
         if($('td#cpu').is(':visible')){
             showCPUInfo()

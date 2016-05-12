@@ -5,7 +5,6 @@ block content
     script(type = "text/javascript").
         var showGraph= !{showGraph};
         var values= !{values};
-    //script(src="https://www.gstatic.com/charts/loader.js")
     script(src = '../../javascripts/GraphController.js')
 
     unless showGraph
@@ -30,3 +29,4 @@ block content
                         input.btn.btn-secondary.btn-fat(type='submit', value='Rechercher', style='text-align:center')
     else
         div(id = 'curve_chart' style="width: 1500px; height: 500px")
+        div(id = 'curve_chart2' style="width: 1500px; height: 500px")
