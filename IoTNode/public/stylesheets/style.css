@@ -1,20 +1,62 @@
 body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+    padding: 50px;
+    font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
 a {
-  color: #00B7FF;
+    color: #00B7FF;
 }
 
-.hide{
-  visibility: hidden;
+.hide {
+    visibility: hidden;
+    display: table-cell !important;
 }
 
+button {
+    margin-left: 80px;
+}
 #info td {
-  width: 250px;
+    width: 250px;
+    padding: 10px;
+    line-height: 30px;
+    font-weight: bold;
+    vertical-align: top;
+
 }
+
+tbody tr{
+    text-align: center;
+}
+
+
+
 
 svg g text {
-  font-size:18px;
+    font-size: 18px;
+}
+
+.navbar-wrapper {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 20;
+    margin-top: 0;
+}
+
+/* Flip around the padding for proper display in narrow viewports */
+.navbar-wrapper > .container {
+    padding-right: 0;
+    padding-left: 0;
+    width: 100%;
+}
+
+.navbar-wrapper .navbar .container {
+
+    width: auto;
+    background-color: #191919;
+}
+
+form {
+    padding-top: 50px;
 }
