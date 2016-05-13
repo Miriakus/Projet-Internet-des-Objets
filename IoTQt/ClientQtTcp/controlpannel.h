@@ -7,6 +7,8 @@
 #include <QLCDNumber>
 #include <QTcpSocket>
 #include <QByteArray>
+#include <QJsonObject>
+#include <QTextEdit>
 
 class ControlPannel : public QWidget
 {
@@ -19,7 +21,19 @@ class ControlPannel : public QWidget
         QLCDNumber *m_lcdNumber;
         QTcpSocket *m_sock;
         QPushButton *m_buttonInfos;
-        QByteArray *m_readBuffer;
+        QJsonObject *m_readBuffer;
+        QTextEdit *m_infosCpu;
+        QTextEdit *m_infosRam;
+        QTextEdit *m_infosSwap;
+        QTextEdit *m_infosDisk;
+        QTextEdit *m_infosNetwork;
+        QTextEdit *m_infosTime;
+        void displayInfosCpu(QJsonObject cpu);
+        void displayInfosRam(QJsonObject ram);
+        void displayInfosSwap(QJsonObject swap);
+        void displayInfosDisk(QJsonObject disk);
+        void displayInfosNetwork(QJsonObject net);
+        void displayInfosTime(QJsonObject time);
 
 
     signals:

@@ -13,8 +13,6 @@ class ClientWindow : public QWidget
 
     public:
         explicit ClientWindow(QWidget *parent = 0);
-        bool ipIsValid(QString IP);
-        bool portIsValid(int port);
         QString m_IP;
         int m_port;
         QTcpSocket sock;

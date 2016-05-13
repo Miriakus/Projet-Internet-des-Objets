@@ -25,7 +25,6 @@ ClientWindow::ClientWindow(QWidget *parent) : QWidget(parent)
 void ClientWindow::connectToTCP(){
     m_IP = m_ipInput->text();
     sock.connectToHost(m_IP, 42000);
-    //QMessageBox::critical(this, "Erreur!", "Veuillez choisir une IP et un port valides!");
 }
 
 void ClientWindow::connectionOk(){
@@ -34,10 +33,3 @@ void ClientWindow::connectionOk(){
     m_controlPannel->show();
 }
 
-bool ClientWindow::ipIsValid(QString IP){
-    return true;
-}
-
-bool ClientWindow::portIsValid(int port){
-    return true;
-}
