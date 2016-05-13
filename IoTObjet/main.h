@@ -9,6 +9,7 @@ typedef struct Store Store;
 struct Store {
     pthread_t threadCapteur;
     pthread_t threadTCP;
+    pthread_t threadInterval;
     pthread_attr_t threadAttr;
     pthread_mutex_t mutexCapteur;
 
@@ -19,6 +20,8 @@ struct Store {
     Capteur capteur;
     Capteur capteurOld;
 };
+
+static void * threadInterval(void*);
 
 # endif /* __MAIN__ */
 

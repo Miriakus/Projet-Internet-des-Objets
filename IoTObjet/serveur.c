@@ -3,18 +3,19 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "main.h"
 #include "serveur.h"
 #include "capteur.h"
 
 #define LBUF 1024
 
-void analyseRequest(char *request, char *response, Store *store, int sid)
+int analyseRequest(char *request, char *response, Store *store, int sid)
 {
     char* params[255];
     int nbParams = splitParams(request, params);
     if (nbParams == 0) {
         sprintf(response, "ERROR : No request !");
-        return;
+        return 0;
     }
     if (strcmp(params[0], "CAPT_JSON") == 0) {
         /* Debut de la zone protegee. */
@@ -24,26 +25,7 @@ void analyseRequest(char *request, char *response, Store *store, int sid)
         /* Fin de la zone protegee. */
     }
     else if (strcmp(params[0], "CAPT_JSON_INTERVAL") == 0) {
-        char json[LBUF];
-        clock_t timer;
-        unsigned int frequence;
-        while (1) {
-            timer = clock();
-            /* Debut de la zone protegee. */
-            pthread_mutex_lock (&store->mutexCapteur);
-            printJSON(json, &store->capteur);
-            frequence = store->frequence;
-            pthread_mutex_unlock (&store->mutexCapteur);
-            /* Fin de la zone protegee. */
-            sprintf(response, "<start|%s|end>", json);
-            if (write(sid,response, strlen(response)) < 0) {
-                close(sid);
-                perror("writeResponceInterval");
-                return;
-            }
-            fprintf(stderr, "Emit Interval : %s\n", response);
-            usleep(frequence * 1000 - (clock()-timer));
-        }
+        return 1;
     }
     else if (strcmp(params[0], "CH_FREQ") == 0 && nbParams == 2) {
         /* Debut de la zone protegee. */
@@ -62,13 +44,9 @@ void analyseRequest(char *request, char *response, Store *store, int sid)
     else {
         sprintf(response, "ERROR : Bad request !");
     }
-    if (write(sid,response, strlen(response)) < 0) {
-        close(sid);
-        perror("writeResponce");
-        return;
-    }
-    fprintf(stderr, "Emit : %s\n", response);
+    return 0;
 }
+
 int splitParams(char *request, char **params)
 {
     int i = 0;

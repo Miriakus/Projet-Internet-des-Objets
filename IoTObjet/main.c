@@ -10,12 +10,14 @@
 #include <netdb.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <signal.h>
 
 #include "main.h"
 #include "capteur.h"
 #include "serveur.h"
 
 #define LBUF 1024
+#define PORT 42000
 
 static Store store =
 {
@@ -86,29 +88,74 @@ char c;
 static void * threadTCP(void *params)
 {
     char request[LBUF], response[LBUF];
-    int sid = (int) params;
-    if (readlig(sid,request,LBUF) < 0) {
-        close(sid);
-       perror("readRequest");
-       return NULL;
+    int sid = (int) params, interval = 0;
+    while (1) {
+        bzero(request, sizeof request);
+        if (readlig(sid,request,LBUF) < 0) {
+            close(sid);
+           perror("readRequest");
+           return NULL;
+        } else
+            fprintf(stderr, "Recu : %s\n", request);
+
+        interval = analyseRequest(request, response, &store, sid);
+
+        if (interval) {
+            if (pthread_create (&store.threadInterval, &store.threadAttr, threadInterval, (void*)(sid)) != 0)
+                error("pthread");
+            else
+                printf("Creation d'un thread d'envoi par interval !\n");
+        } else {
+            if (write(sid,response, strlen(response)) < 0) {
+                close(sid);
+                //pthread_cancel(&store.threadInterval);
+                perror("writeResponce");
+                return NULL;
+            } else
+                fprintf(stderr, "Emit : %s\n", response);
+        }
     }
-    fprintf(stderr, "Recu : %s\n", request);
-
-    analyseRequest(request, response, &store, sid);
-
     close(sid);
     return NULL;
 }
 
+static void * threadInterval(void *params)
+{
+    int sid = (int) params, err;
+    char json[LBUF];
+    char response[LBUF];
+    clock_t timer;
+    unsigned int frequence;
+    while (1) {
+        timer = clock();
+        /* Debut de la zone protegee. */
+        pthread_mutex_lock (&store.mutexCapteur);
+        printJSON(json, &store.capteur);
+        frequence = store.frequence;
+        pthread_mutex_unlock (&store.mutexCapteur);
+        /* Fin de la zone protegee. */
+        sprintf(&response, "<start|%s|end>", json);
+
+        if (write(sid,&response, strlen(response)) < 0) {
+            close(sid);
+            perror("writeResponceInterval");
+            return NULL;
+        }
+        fprintf(stderr, "Emit Interval : %s\n", response);
+        usleep(frequence * 1000 - (clock()-timer));
+    }
+}
+
 int main(int N, char *P[])
 {
+    signal(SIGPIPE, SIG_IGN);
     struct sockaddr_in Sin = {AF_INET}; /* le reste est nul */
     int ln, sock, nsock, err;
     /* creation du socket */
     if ((sock=socket(AF_INET,SOCK_STREAM,IPPROTO_TCP)) < 0)
         error("socket");
     /* ATTACHEMENT AU PORT */
-    Sin.sin_port = htons(42000);
+    Sin.sin_port = htons(PORT);
     if (bind(sock,(struct sockaddr*)&Sin, sizeof(Sin)) < 0)
         error("bind");
     ln = sizeof(Sin);

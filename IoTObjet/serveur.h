@@ -4,7 +4,7 @@
 #include "main.h"
 
 int isSepa(char);
-void analyseRequest(char*, char*, Store*, int);
+int analyseRequest(char*, char*, Store*, int);
 int splitParams(char*, char**);
 
 # endif /* __SERVEUR__ */
