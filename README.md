@@ -10,3 +10,47 @@
 - Guillaume
 - Mattias
 - Léo
+
+# Structure des données en JSON
+     {
+          cpu: {
+               user,
+               nice,
+               system,
+               idle,
+               pcentUsed
+          },
+          ram: {
+               total,
+               free,
+               buffers,
+               cached,
+               used,
+               pcentUsed
+          },
+          swap: {
+               total,
+               free,
+               cached,
+               used,
+               pcentUsed
+          },
+          disk: {
+               totalRead,
+               totalWrite,
+               totalTimeActive,
+               debitRead,
+               debitWrite,
+               pcentActive
+          },
+          network: {
+               totalDown,
+               totalUp,
+               debitDown,
+               debitUp
+          },
+          time: {
+               sec,
+               microsec
+          }
+     }
