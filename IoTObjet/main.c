@@ -93,35 +93,31 @@ static void * threadTCP(void *params)
         bzero(request, sizeof request);
         if (readlig(sid,request,LBUF) < 0) {
             close(sid);
-           perror("readRequest");
-           return NULL;
+            perror("readRequest");
+            return NULL;
         } else
             fprintf(stderr, "Recu : %s\n", request);
 
         interval = analyseRequest(request, response, &store, sid);
 
         if (interval) {
-            if (pthread_create (&store.threadInterval, &store.threadAttr, threadInterval, (void*)(sid)) != 0)
+            if (pthread_create (&store.threadInterval, &store.threadAttr, threadInterval, params) != 0)
                 error("pthread");
             else
                 printf("Creation d'un thread d'envoi par interval !\n");
         } else {
-            if (write(sid,response, strlen(response)) < 0) {
-                close(sid);
-                //pthread_cancel(&store.threadInterval);
-                perror("writeResponce");
+            if (writeResponce(sid, response))
                 return NULL;
-            } else
-                fprintf(stderr, "Emit : %s\n", response);
         }
+        usleep(1000);
     }
     close(sid);
     return NULL;
 }
 
-static void * threadInterval(void *params)
+void * threadInterval(void *params)
 {
-    int sid = (int) params, err;
+    int sid = (int) params;
     char json[LBUF];
     char response[LBUF];
     clock_t timer;
@@ -134,14 +130,10 @@ static void * threadInterval(void *params)
         frequence = store.frequence;
         pthread_mutex_unlock (&store.mutexCapteur);
         /* Fin de la zone protegee. */
-        sprintf(&response, "<start|%s|end>", json);
+        sprintf(response, "<start|%s|end>", json);
 
-        if (write(sid,&response, strlen(response)) < 0) {
-            close(sid);
-            perror("writeResponceInterval");
+        if (writeResponce(sid, response))
             return NULL;
-        }
-        fprintf(stderr, "Emit Interval : %s\n", response);
         usleep(frequence * 1000 - (clock()-timer));
     }
 }

@@ -21,7 +21,7 @@ struct Store {
     Capteur capteurOld;
 };
 
-static void * threadInterval(void*);
+void * threadInterval(void*);
 
 # endif /* __MAIN__ */
 

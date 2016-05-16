@@ -23,7 +23,7 @@
 1462808214 /home/leo/Documents/Projet-Internet-des-Objets/IoTObjet/serveur.c
 	<stdio.h>
 
-1463126431 source:/home/leo/Documents/Projet-Internet-des-Objets/IoTObjet/serveur.c
+1463358645 source:/home/leo/Documents/Projet-Internet-des-Objets/IoTObjet/serveur.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
@@ -32,7 +32,7 @@
 	"serveur.h"
 	"capteur.h"
 
-1463097934 /home/leo/Documents/Projet-Internet-des-Objets/IoTObjet/serveur.h
+1463357876 /home/leo/Documents/Projet-Internet-des-Objets/IoTObjet/serveur.h
 	"main.h"
 
 1462869095 /home/leo/Documents/Projet-Internet-des-Objets/IoTObjet/objet.c
@@ -47,7 +47,7 @@
 	"capteur.h"
 	"serveur.h"
 
-1463099337 source:/home/leo/Documents/Projet-Internet-des-Objets/IoTObjet/main.c
+1463357876 source:/home/leo/Documents/Projet-Internet-des-Objets/IoTObjet/main.c
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
@@ -56,11 +56,12 @@
 	<netdb.h>
 	<unistd.h>
 	<pthread.h>
+	<signal.h>
 	"main.h"
 	"capteur.h"
 	"serveur.h"
 
-1463064847 /home/leo/Documents/Projet-Internet-des-Objets/IoTObjet/main.h
+1463266422 /home/leo/Documents/Projet-Internet-des-Objets/IoTObjet/main.h
 	<pthread.h>
 	"capteur.h"
 

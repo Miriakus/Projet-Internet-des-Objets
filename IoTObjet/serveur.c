@@ -32,18 +32,32 @@ int analyseRequest(char *request, char *response, Store *store, int sid)
         pthread_mutex_lock (&store->mutexCapteur);
         if (strtol(params[1], NULL, 0) >= 100) {
             store->frequence = (unsigned int) strtol(params[1], NULL, 0);
-            sprintf(response, "La frequence est maintenant de %d", store->frequence);
+            sprintf(response, "SUCCESS : The frequency is now %d ms.", store->frequence);
         } else
-            sprintf(response, "Valeur incorrecte, la frequence est de %d", store->frequence);
+            sprintf(response, "ERROR : Bad value, the frequency is %d ms.", store->frequence);
         pthread_mutex_unlock (&store->mutexCapteur);
         /* Fin de la zone protegee. */
     }
     else if (strcmp(params[0], "QUIT") == 0) {
+        sprintf(response, "SUCCESS : This application will stop in 3 seconds.");
+        writeResponce(sid, response);
+        sleep(3);
         exit(42);
     }
     else {
         sprintf(response, "ERROR : Bad request !");
     }
+    return 0;
+}
+
+int writeResponce(int socketId, char *response)
+{
+    if (write(socketId, response, strlen(response)) < 0) {
+        close(socketId);
+        perror("Write");
+        return 1;
+    }
+    fprintf(stderr, "Emit : %s\n", response);
     return 0;
 }
 
