@@ -18,7 +18,7 @@
 Cpu cpuCheck()
 {
     FILE *fp;
-	Cpu proc;
+    Cpu proc;
 
     if ((fp = fopen(FicCPU, "r")) == NULL) return proc;
     fscanf(fp, "cpu\t%ld %ld %ld %ld", &proc.user, &proc.nice, &proc.system, &proc.idle);
@@ -50,7 +50,8 @@ Ram ramCheck()
 
     //printf("ram %ld %ld %ld %ld \n", memory.total, memory.free, memory.buffers, memory.cached);
     memory.used = memory.total - memory.free - memory.buffers - memory.cached;
-    memory.pcentUsed = (double) ((double) (memory.total - memory.free - memory.buffers - memory.cached) / memory.total) * 100;
+    memory.pcentUsed =
+            (double) ((double) (memory.total - memory.free - memory.buffers - memory.cached) / memory.total) * 100;
 
     return memory;
 }
@@ -89,7 +90,7 @@ Disk diskCheck()
 
     if ((fp = fopen(FicDisk, "r")) == NULL) return disk;
     fscanf(fp, "%s %s %ld %s %s %s %ld %s %s %ld",
-        buf, buf, &disk.totalRead, buf, buf, buf, &disk.totalWrite, buf, buf, &disk.totalTimeActive);
+           buf, buf, &disk.totalRead, buf, buf, buf, &disk.totalWrite, buf, buf, &disk.totalTimeActive);
     fclose(fp);
 
     //printf("disk %ld %ld %ld\n", disk.totalRead, disk.totalWrite, disk.totalTimeActive);
@@ -104,14 +105,14 @@ Network networkCheck()
     FILE *fp;
     char buf[LBUF];
     Network eth;
-	int i;
+    int i;
 
     if ((fp = fopen(FicNet, "r")) == NULL) return eth;
-	fgets(buf, LBUF, fp);
-	fgets(buf, LBUF, fp);
+    fgets(buf, LBUF, fp);
+    fgets(buf, LBUF, fp);
     fscanf(fp, "%s %ld", buf, &eth.totalDown);
-	for (i=0; i<7; i++)
-		fscanf(fp, "%s", buf);
+    for (i = 0; i < 7; i++)
+        fscanf(fp, "%s", buf);
     fscanf(fp, "%ld", &eth.totalUp);
     fclose(fp);
 
@@ -145,7 +146,7 @@ void calcCpuPcent(Cpu *cpu, Cpu *cpuOld)
     diffIdle = cpu->idle - cpuOld->idle;
 
     cpu->pcentUsed = (double) ((diffUser + diffNice + diffSystem) * 100L)
-        / (double) (diffUser + diffNice + diffSystem + diffIdle);
+                     / (double) (diffUser + diffNice + diffSystem + diffIdle);
 }
 
 void calcDiskDebit(Disk *disk, Disk *diskOld, unsigned int frequence)
@@ -166,7 +167,6 @@ long calcDebit(long total, long totalOld, unsigned int frequence)
     return (long) ((double) (total - totalOld) / (double) ((double) frequence / 1000));
 }
 
-
 void printJSON(char *json, Capteur *capteur)
 {
     Cpu *cpu = &capteur->cpu;
@@ -176,10 +176,10 @@ void printJSON(char *json, Capteur *capteur)
     Network *network = &capteur->network;
 
     sprintf(json, "{ \"cpu\": { \"user\": %ld, \"nice\": %ld, \"system\": %ld, \"idle\": %ld, \"pcentUsed\": %g }, \"ram\": { \"total\": %ld, \"free\": %ld, \"buffers\": %ld, \"cached\": %ld, \"used\": %ld, \"pcentUsed\": %g }, \"swap\": { \"total\": %ld, \"free\": %ld, \"cached\": %ld, \"used\": %ld, \"pcentUsed\": %g }, \"disk\": { \"totalRead\": %ld, \"totalWrite\": %ld, \"totalTimeActive\": %ld, \"debitRead\": %ld, \"debitWrite\": %ld, \"pcentActive\": %g }, \"network\": { \"totalDown\": %ld, \"totalUp\": %ld, \"debitDown\": %ld, \"debitUp\": %ld },\"time\": { \"sec\": %ld, \"microsec\": %ld } }",
-        cpu->user, cpu->nice, cpu->system, cpu->idle, cpu->pcentUsed,
-        ram->total, ram->free, ram->buffers, ram->cached, ram->used, ram->pcentUsed,
-        swap->total, swap->free, swap->cached, swap->used, swap->pcentUsed,
-        disk->totalRead, disk->totalWrite, disk->totalTimeActive, disk->debitRead, disk->debitWrite, disk->pcentActive,
-        network->totalDown, network->totalUp, network->debitDown, network->debitUp,
-        capteur->time.sec, capteur->time.microsec);
+            cpu->user, cpu->nice, cpu->system, cpu->idle, cpu->pcentUsed,
+            ram->total, ram->free, ram->buffers, ram->cached, ram->used, ram->pcentUsed,
+            swap->total, swap->free, swap->cached, swap->used, swap->pcentUsed,
+            disk->totalRead, disk->totalWrite, disk->totalTimeActive, disk->debitRead, disk->debitWrite, disk->pcentActive,
+            network->totalDown, network->totalUp, network->debitDown, network->debitUp,
+            capteur->time.sec, capteur->time.microsec);
 }

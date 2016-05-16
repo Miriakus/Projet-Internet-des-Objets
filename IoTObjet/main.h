@@ -13,15 +13,15 @@ struct Store {
     pthread_attr_t threadAttr;
     pthread_mutex_t mutexCapteur;
 
-    char* address;
-    char* port;
+    char *address;
+    char *port;
     unsigned int frequence;         // millisecondes
 
     Capteur capteur;
     Capteur capteurOld;
 };
 
-void * threadInterval(void*);
+void *threadInterval(void*);
 
 # endif /* __MAIN__ */
 

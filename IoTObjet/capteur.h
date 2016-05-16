@@ -49,8 +49,8 @@ struct Network {
 
 typedef struct Time Time;
 struct Time {
-    long sec;
-    long microsec;
+    long sec;               // s
+    long microsec;          // µs
 };
 
 typedef struct Capteur Capteur;

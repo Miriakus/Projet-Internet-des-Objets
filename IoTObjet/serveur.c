@@ -11,7 +11,7 @@
 
 int analyseRequest(char *request, char *response, Store *store, int sid)
 {
-    char* params[255];
+    char *params[255];
     int nbParams = splitParams(request, params);
     if (nbParams == 0) {
         sprintf(response, "ERROR : No request !");
@@ -19,9 +19,9 @@ int analyseRequest(char *request, char *response, Store *store, int sid)
     }
     if (strcmp(params[0], "CAPT_JSON") == 0) {
         /* Debut de la zone protegee. */
-        pthread_mutex_lock (&store->mutexCapteur);
+        pthread_mutex_lock(&store->mutexCapteur);
         printJSON(response, &store->capteur);
-        pthread_mutex_unlock (&store->mutexCapteur);
+        pthread_mutex_unlock(&store->mutexCapteur);
         /* Fin de la zone protegee. */
     }
     else if (strcmp(params[0], "CAPT_JSON_INTERVAL") == 0) {
@@ -29,13 +29,13 @@ int analyseRequest(char *request, char *response, Store *store, int sid)
     }
     else if (strcmp(params[0], "CH_FREQ") == 0 && nbParams == 2) {
         /* Debut de la zone protegee. */
-        pthread_mutex_lock (&store->mutexCapteur);
+        pthread_mutex_lock(&store->mutexCapteur);
         if (strtol(params[1], NULL, 0) >= 100) {
             store->frequence = (unsigned int) strtol(params[1], NULL, 0);
             sprintf(response, "SUCCESS : The frequency is now %d ms.", store->frequence);
         } else
             sprintf(response, "ERROR : Bad value, the frequency is %d ms.", store->frequence);
-        pthread_mutex_unlock (&store->mutexCapteur);
+        pthread_mutex_unlock(&store->mutexCapteur);
         /* Fin de la zone protegee. */
     }
     else if (strcmp(params[0], "QUIT") == 0) {
@@ -67,13 +67,13 @@ int splitParams(char *request, char **params)
     while (1) {
         // On recherche le debut du mot
         while (*request != '\0') {
-		    if (!isSepa(*request))
+            if (!isSepa(*request))
                 break;
-		    request++;
-	    }
+            request++;
+        }
         if (*request == '\0') // Si aucun debut de mot trouve
             break;
-        params[i++]=request;
+        params[i++] = request;
         // On recherche la fin du mot
         while (*request != '\0') {
             if (isSepa(*request))
@@ -86,8 +86,7 @@ int splitParams(char *request, char **params)
         request++;
     }
     params[i] = NULL;
-    for(i=0; params[i] != NULL; i++)
-    {
+    for (i = 0; params[i] != NULL; i++) {
         printf("%d: %s\n", i, params[i]);
     }
     return i;
@@ -96,7 +95,7 @@ int splitParams(char *request, char **params)
 /* fonction qui determine si un caractere est un separateur */
 int isSepa(char c)
 {
-	if (c == ' ') return 1;
-	if (c == '\t') return 1;
-	return 0;
+    if (c == ' ') return 1;
+    if (c == '\t') return 1;
+    return 0;
 }
