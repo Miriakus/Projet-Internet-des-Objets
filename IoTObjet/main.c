@@ -170,19 +170,18 @@ int main(int N, char *P[])
 
     // Creation des threads
     if (pthread_create (&store.threadCapteur, &store.threadAttr, threadCapteur, NULL) != 0)
-        error("pthread");
+        error("Pthread");
     else
         printf("Creation du thread d'acquisition des capteurs !\n");
 
     /* boucle d'attente */
     for (;;) {
         if ((nsock=accept(sock,(struct sockaddr*)&Sin,(socklen_t*)&ln))<0)
-            error("accept");
+            error("Accept");
         /* creation d'un thread qui va executer la fct threadTCP */
-        if ((err=pthread_create(&store.threadTCP, &store.threadAttr, threadTCP, (void*)((long)nsock))) != 0) {
-            fprintf(stderr,"Erreur %d sur pthread_create()\n",err);
-            exit(7);
-        } else
+        if (pthread_create(&store.threadTCP, &store.threadAttr, threadTCP, (void*)((long)nsock)) != 0)
+            error("Pthread");
+        else
             printf("Creation d'un thread de connexion !\n");
     }
     //pthread_join (store.threadCapteur, NULL);
