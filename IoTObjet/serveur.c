@@ -31,7 +31,7 @@ int analyseRequest(char *request, char *response, Store *store, int sid)
         /* Debut de la zone protegee. */
         pthread_mutex_lock(&store->mutexCapteur);
         if (strtol(params[1], NULL, 0) >= 100) {
-            store->frequence = (unsigned int) strtol(params[1], NULL, 0);
+            store->frequence = (unsigned int) strtoul(params[1], NULL, 0);
             sprintf(response, "SUCCESS : The frequency is now %d ms.", store->frequence);
         } else
             sprintf(response, "ERROR : Bad value, the frequency is %d ms.", store->frequence);
@@ -86,9 +86,9 @@ int splitParams(char *request, char **params)
         request++;
     }
     params[i] = NULL;
-    for (i = 0; params[i] != NULL; i++) {
+    /*for (i = 0; params[i] != NULL; i++) {
         printf("%d: %s\n", i, params[i]);
-    }
+    }*/
     return i;
 }
 

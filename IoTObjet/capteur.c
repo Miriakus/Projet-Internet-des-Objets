@@ -121,19 +121,26 @@ Network networkCheck()
     return eth;
 }
 
-void capteurCheck(Capteur *capteur)
+Time timeCheck()
 {
     struct timeval tv;
-    gettimeofday(&tv, NULL);
+    Time time;
 
+    gettimeofday(&tv, NULL);
+    time.sec = (long) tv.tv_sec;
+    time.microsec = (long) tv.tv_usec;
+
+    return time;
+}
+
+void capteurCheck(Capteur *capteur)
+{
     capteur->cpu = cpuCheck();
     capteur->ram = ramCheck();
     capteur->swap = swapCheck();
     capteur->disk = diskCheck();
     capteur->network = networkCheck();
-    capteur->time.sec = (long) tv.tv_sec;
-    capteur->time.microsec = (long) tv.tv_usec;
-
+    capteur->time = timeCheck();
 }
 
 void calcCpuPcent(Cpu *cpu, Cpu *cpuOld)

@@ -14,7 +14,7 @@ struct Store {
     pthread_mutex_t mutexCapteur;
 
     char *address;
-    char *port;
+    unsigned int port;
     unsigned int frequence;         // millisecondes
 
     Capteur capteur;
